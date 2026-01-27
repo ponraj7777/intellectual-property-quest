@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { toast } from 'sonner';
+import { modulesData } from '../data/modules';
 
 const GameContext = createContext();
 
@@ -57,14 +58,6 @@ export const GameProvider = ({ children }) => {
             const newXp = prev + amount;
             const newLevel = Math.floor(newXp / 1000) + 1;
 
-            // Notification for XP threshold unlocks
-            if (prev < XP_THRESHOLDS.medium && newXp >= XP_THRESHOLDS.medium) {
-                toast.success("🔥 ADVANCED CHALLENGE UNLOCKED: Medium difficulty is now available!");
-            }
-            if (prev < XP_THRESHOLDS.hard && newXp >= XP_THRESHOLDS.hard) {
-                toast.success("💎 ELITE CHALLENGE UNLOCKED: Hard difficulty is now available!");
-            }
-
             if (newLevel > level) {
                 setLevel(newLevel);
                 toast.success(`Level Up! You are now Level ${newLevel}`);
@@ -95,32 +88,38 @@ export const GameProvider = ({ children }) => {
         }
     };
 
-    const isDifficultyUnlocked = (difficulty) => {
-        return xp >= XP_THRESHOLDS[difficulty];
-    };
-
-    const isLevelUnlocked = (moduleId, levelIndex, difficulty = 'easy') => {
-        // Global XP check for difficulty
-        if (!isDifficultyUnlocked(difficulty)) return false;
-
-        // All Easy levels are unlocked by default
+    const isDifficultyUnlocked = (moduleId, difficulty) => {
+        // All Easy levels are unlocked by default for every category
         if (difficulty === 'easy') return true;
 
-        // Within game sequential check (Easy -> Medium -> Hard)
+        const module = modulesData.find(m => m.id === moduleId);
+        if (!module) return false;
+
         if (difficulty === 'medium') {
-            return completedLevels.includes(`${moduleId}-${levelIndex}-easy`);
+            // Unlocks if ALL easy games in this module are completed
+            return module.games.every((_, index) =>
+                completedLevels.includes(`${moduleId}-${index}-easy`)
+            );
         }
+
         if (difficulty === 'hard') {
-            return completedLevels.includes(`${moduleId}-${levelIndex}-medium`);
+            // Unlocks if ALL medium games in this module are completed
+            return module.games.every((_, index) =>
+                completedLevels.includes(`${moduleId}-${index}-medium`)
+            );
         }
 
         return false;
     };
 
+    const isLevelUnlocked = (moduleId, levelIndex, difficulty = 'easy') => {
+        // First check if the difficulty itself is unlocked for this module
+        return isDifficultyUnlocked(moduleId, difficulty);
+    };
+
     const getNextMilestone = () => {
-        if (xp < XP_THRESHOLDS.medium) return { xp: XP_THRESHOLDS.medium, label: 'Medium' };
-        if (xp < XP_THRESHOLDS.hard) return { xp: XP_THRESHOLDS.hard, label: 'Hard' };
-        return null;
+        const nextLevelXp = level * 1000;
+        return { xp: nextLevelXp, label: `Level ${level + 1}` };
     };
 
     const unlockBadge = (badgeId) => {
@@ -128,13 +127,27 @@ export const GameProvider = ({ children }) => {
             setBadges(prev => [...prev, badgeId]);
             toast.success("New Badge Unlocked!");
         }
-    }
+    };
+
+    const resetProgress = () => {
+        setXp(0);
+        setLevel(1);
+        setCompletedModules([]);
+        setCompletedLevels([]);
+        setBadges([]);
+        localStorage.removeItem('quest_xp');
+        localStorage.removeItem('quest_level');
+        localStorage.removeItem('quest_completed_modules');
+        localStorage.removeItem('quest_completed_levels');
+        localStorage.removeItem('quest_badges');
+        toast.info("Journey Reset!");
+    };
 
     return (
         <GameContext.Provider value={{
             user, xp, level, completedModules, completedLevels, badges, XP_THRESHOLDS,
             login, signup, logout, addXp, completeLevel, completeModule, unlockBadge,
-            isLevelUnlocked, isDifficultyUnlocked, getNextMilestone
+            isLevelUnlocked, isDifficultyUnlocked, getNextMilestone, resetProgress
         }}>
             {children}
         </GameContext.Provider>

@@ -14,7 +14,7 @@ const ModuleDetail = () => {
     const { moduleId } = useParams();
     const location = useLocation();
     const module = modulesData.find(m => m.id === moduleId);
-    const { completedModules, isLevelUnlocked } = useGame();
+    const { completedModules, isLevelUnlocked, completedLevels } = useGame();
 
     const [activeGameIndex, setActiveGameIndex] = useState(null);
     const [difficulty, setDifficulty] = useState('easy');
@@ -144,15 +144,28 @@ const ModuleDetail = () => {
                                                 <div>
                                                     <div className="flex items-center gap-2">
                                                         <span className="text-[10px] font-black uppercase tracking-widest text-quest-muted">Challenge {index + 1}</span>
-                                                        <span className={`text-[10px] px-1.5 py-0.5 rounded font-bold uppercase ${!unlocked ? 'bg-red-500/10 text-red-400' : 'bg-quest-primary/10 text-quest-primary'
-                                                            }`}>
-                                                            {difficulty} {unlocked ? 'Unlocked' : 'Locked'}
-                                                        </span>
+                                                        {completedLevels.includes(`${module.id}-${index}-${difficulty}`) ? (
+                                                            <span className="text-[10px] px-1.5 py-0.5 rounded font-bold uppercase bg-green-500/20 text-green-400">
+                                                                Completed
+                                                            </span>
+                                                        ) : (
+                                                            <span className={`text-[10px] px-1.5 py-0.5 rounded font-bold uppercase ${!unlocked ? 'bg-red-500/10 text-red-400' : 'bg-quest-primary/10 text-quest-primary'
+                                                                }`}>
+                                                                {difficulty} {unlocked ? 'Unlocked' : 'Locked'}
+                                                            </span>
+                                                        )}
                                                     </div>
                                                     <h3 className={`text-lg font-bold transition-colors ${unlocked ? 'group-hover:text-quest-primary' : 'text-white/30'}`}>
                                                         {game.title}
                                                     </h3>
-                                                    <p className="text-sm text-quest-muted">{unlocked ? game.description : 'Complete previous difficulty/XP threshold to unlock'}</p>
+                                                    <p className="text-sm text-quest-muted">
+                                                        {completedLevels.includes(`${module.id}-${index}-${difficulty}`)
+                                                            ? 'Challenge mastered!'
+                                                            : unlocked
+                                                                ? game.description
+                                                                : 'Complete previous difficulty to unlock'
+                                                        }
+                                                    </p>
                                                 </div>
                                             </div>
                                             {unlocked && <ChevronRight className="w-5 h-5 text-quest-muted group-hover:translate-x-1 transition-transform" />}

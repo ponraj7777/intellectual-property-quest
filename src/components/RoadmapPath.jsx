@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 
-const RoadmapPath = ({ isCompleted, isFromLeft }) => {
+const RoadmapPath = ({ isCompleted, isFromLeft, progress = 0 }) => {
     // 768px matches the max-w-3xl container width.
     const viewBoxWidth = 768;
     const height = 100; // Matches the gap between nodes in Roadmap.jsx
@@ -52,20 +52,18 @@ const RoadmapPath = ({ isCompleted, isFromLeft }) => {
                 />
 
                 {/* completion path (Active/Glow) */}
-                {isCompleted && (
-                    <motion.path
-                        initial={{ pathLength: 0 }}
-                        animate={{ pathLength: 1 }}
-                        transition={{ duration: 1.5, ease: "easeInOut" }}
-                        d={path}
-                        fill="none"
-                        stroke={`url(#pathGradient-${isFromLeft ? 'L' : 'R'})`}
-                        strokeWidth="6"
-                        strokeLinecap="round"
-                        filter="url(#glow-enhanced)"
-                        className="opacity-100"
-                    />
-                )}
+                <motion.path
+                    initial={{ pathLength: 0 }}
+                    animate={{ pathLength: isCompleted ? 1 : progress }}
+                    transition={{ duration: 1, ease: "easeOut" }}
+                    d={path}
+                    fill="none"
+                    stroke={`url(#pathGradient-${isFromLeft ? 'L' : 'R'})`}
+                    strokeWidth="6"
+                    strokeLinecap="round"
+                    filter="url(#glow-enhanced)"
+                    className="opacity-100"
+                />
             </svg>
         </div>
     );

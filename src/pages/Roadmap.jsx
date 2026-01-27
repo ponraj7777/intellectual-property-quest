@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, ChevronRight, Info, Award, Circle } from 'lucide-react';
+import { ArrowLeft, ChevronRight, Info, Award, Circle, RotateCcw } from 'lucide-react';
 import { modulesData } from '../data/modules';
 import { useGame } from '../hooks/useGame';
 import RoadmapNode from '../components/RoadmapNode';
@@ -9,25 +9,10 @@ import RoadmapPath from '../components/RoadmapPath';
 
 const Roadmap = () => {
     const navigate = useNavigate();
-    const { completedLevels, isLevelUnlocked, XP_THRESHOLDS } = useGame();
+    const { completedLevels, isLevelUnlocked, resetProgress } = useGame();
     const [activeModuleIndex, setActiveModuleIndex] = useState(0);
 
     const activeModule = modulesData[activeModuleIndex];
-
-    const getGameProgress = (moduleId, gameIndex) => {
-        const diffs = ['easy', 'medium', 'hard'];
-        const difficulties = {};
-
-        diffs.forEach(diff => {
-            difficulties[diff] = {
-                isCompleted: completedLevels.includes(`${moduleId}-${gameIndex}-${diff}`),
-                isLocked: !isLevelUnlocked(moduleId, gameIndex, diff),
-                xpRequired: XP_THRESHOLDS[diff]
-            };
-        });
-
-        return difficulties;
-    };
 
     const calculateProgress = (module) => {
         const totalLevels = module.games.length * 3; // 3 difficulties per game
@@ -42,15 +27,6 @@ const Roadmap = () => {
         });
 
         return Math.round((completed / totalLevels) * 100);
-    };
-
-    const handleSelectLevel = (moduleId, gameIndex, difficulty) => {
-        navigate(`/modules/${moduleId}`, {
-            state: {
-                activeLevel: gameIndex,
-                difficulty: difficulty
-            }
-        });
     };
 
     return (
@@ -92,6 +68,20 @@ const Roadmap = () => {
                             </div>
                         </button>
                     ))}
+
+                    <div className="pt-8 mt-8 border-t border-white/10">
+                        <button
+                            onClick={() => {
+                                if (window.confirm("Are you sure you want to reset your entire journey? This cannot be undone.")) {
+                                    resetProgress();
+                                }
+                            }}
+                            className="w-full flex items-center justify-center gap-2 p-3 rounded-xl border border-red-500/20 bg-red-500/5 text-red-400 hover:bg-red-500/10 transition-all text-xs font-bold uppercase tracking-widest"
+                        >
+                            <RotateCcw className="w-3 h-3" />
+                            Reset Journey
+                        </button>
+                    </div>
                 </div>
 
                 {/* Roadmap Area */}
@@ -129,21 +119,32 @@ const Roadmap = () => {
 
                         {/* Level Path - Zig Zag Flow */}
                         <div className="flex flex-col items-center gap-[100px] py-10 w-full max-w-3xl mx-auto">
-                            {activeModule.games.map((game, index) => {
-                                const difficulties = getGameProgress(activeModule.id, index);
+                            {['easy', 'medium', 'hard'].map((difficulty, index) => {
+                                const isLocked = !isLevelUnlocked(activeModule.id, 0, difficulty);
+                                const totalInDifficulty = activeModule.games.length;
+                                const completedInDifficulty = activeModule.games.filter((_, gIdx) =>
+                                    completedLevels.includes(`${activeModule.id}-${gIdx}-${difficulty}`)
+                                ).length;
+
+                                const isCompleted = completedInDifficulty === totalInDifficulty;
+                                const progress = totalInDifficulty > 0 ? completedInDifficulty / totalInDifficulty : 0;
                                 const isEven = index % 2 === 0;
 
                                 return (
-                                    <React.Fragment key={index}>
+                                    <React.Fragment key={difficulty}>
                                         <div className={`flex items-center w-full px-4 md:px-0 relative z-10 ${isEven ? 'justify-start md:flex-row' : 'justify-end md:flex-row-reverse'}`}>
                                             {/* Node */}
                                             <div className="flex-shrink-0">
                                                 <RoadmapNode
-                                                    level={index + 1}
-                                                    gameTitle={game.title}
-                                                    difficulties={difficulties}
+                                                    level={difficulty.charAt(0).toUpperCase() + difficulty.slice(1)}
+                                                    gameTitle={`${completedInDifficulty}/${totalInDifficulty} Challenges`}
+                                                    status={{
+                                                        isLocked,
+                                                        isCompleted,
+                                                        progress
+                                                    }}
                                                     colorClass={activeModule.color}
-                                                    onSelectDifficulty={(diff) => handleSelectLevel(activeModule.id, index, diff)}
+                                                    onSelect={() => navigate(`/modules/${activeModule.id}`, { state: { difficulty } })}
                                                 />
                                             </div>
 
@@ -151,41 +152,29 @@ const Roadmap = () => {
                                             <div className={`
                                                 hidden md:block md:w-1/2 px-12 transition-all duration-500
                                                 ${isEven ? 'text-left' : 'text-right'}
-                                                ${difficulties.easy.isLocked ? 'opacity-40' : 'opacity-100'}
+                                                ${isLocked ? 'opacity-40' : 'opacity-100'}
                                             `}>
-                                                <h3 className={`font-bold text-xl mb-2 ${difficulties.easy.isLocked ? 'text-white/20' : 'text-white'}`}>
-                                                    {game.title}
+                                                <h3 className={`font-bold text-xl mb-2 ${isLocked ? 'text-white/20' : 'text-white'}`}>
+                                                    {difficulty.toUpperCase()} MODE
                                                 </h3>
-                                                <p className={`text-base leading-relaxed ${difficulties.easy.isLocked ? 'text-white/10' : 'text-quest-muted'}`}>
-                                                    {game.description}
-                                                </p>
-                                            </div>
-
-                                            {/* Mobile Content */}
-                                            <div className="md:hidden ml-6 flex-1">
-                                                <h3 className={`font-bold text-lg mb-1 ${difficulties.easy.isLocked ? 'text-white/20' : 'text-white'}`}>
-                                                    {game.title}
-                                                </h3>
-                                                <p className={`text-sm ${difficulties.easy.isLocked ? 'text-white/10' : 'text-quest-muted'}`}>
-                                                    {game.description}
+                                                <p className={`text-base leading-relaxed ${isLocked ? 'text-white/10' : 'text-quest-muted'}`}>
+                                                    {isCompleted
+                                                        ? `Mastered all ${difficulty} challenges!`
+                                                        : isLocked
+                                                            ? `Complete all ${index === 1 ? 'Easy' : 'Medium'} games to unlock.`
+                                                            : `Complete ${totalInDifficulty - completedInDifficulty} more to unlock next level.`}
                                                 </p>
                                             </div>
                                         </div>
 
                                         {/* Connecting Path */}
-                                        {index < activeModule.games.length - 1 && (
+                                        {index < 2 && (
                                             <div className="w-full z-0 hidden md:block">
                                                 <RoadmapPath
-                                                    isCompleted={difficulties.easy.isCompleted}
+                                                    isCompleted={isCompleted}
+                                                    progress={progress}
                                                     isFromLeft={isEven}
                                                 />
-                                            </div>
-                                        )}
-
-                                        {/* Mobile Path (Simplified Vertical) */}
-                                        {index < activeModule.games.length - 1 && (
-                                            <div className="md:hidden flex flex-col items-center -my-10 ml-[32px] opacity-20">
-                                                <div className="w-1.5 h-20 bg-white/20 rounded-full"></div>
                                             </div>
                                         )}
                                     </React.Fragment>
