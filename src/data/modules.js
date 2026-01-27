@@ -18,14 +18,32 @@ export const modulesData = [
                         left: { id: 'patentable', label: 'Patentable' },
                         right: { id: 'not_patentable', label: 'Not Patentable' }
                     },
-                    items: [
-                        { text: "New Solar Panel Design", correctCategory: 'patentable' },
-                        { text: "Abstract Idea", correctCategory: 'not_patentable' },
-                        { text: "Mathematical Formula", correctCategory: 'not_patentable' },
-                        { text: "Chemical Compound", correctCategory: 'patentable' },
-                        { text: "Law of Nature", correctCategory: 'not_patentable' },
-                        { text: "Manufacturing Process", correctCategory: 'patentable' },
-                    ]
+                    items: {
+                        easy: [
+                            { text: "Improved Water Bottle Cap Design", correctCategory: "patentable" },
+                            { text: "Pure Mathematical Equation", correctCategory: "not_patentable" },
+                            { text: "Mobile Phone Charging Circuit", correctCategory: "patentable" },
+                            { text: "Scientific Theory", correctCategory: "not_patentable" },
+                            { text: "Mechanical Gear System", correctCategory: "patentable" },
+                            { text: "Idea for a New Business Model", correctCategory: "not_patentable" }
+                        ],
+                        medium: [
+                            { text: "AI-Based Traffic Signal Optimization System", correctCategory: "patentable" },
+                            { text: "Algorithm for Sorting Numbers", correctCategory: "not_patentable" },
+                            { text: "Wearable Device for Monitoring Heart Rate", correctCategory: "patentable" },
+                            { text: "Natural Discovery of a New Star", correctCategory: "not_patentable" },
+                            { text: "Improved Battery Cooling Mechanism", correctCategory: "patentable" },
+                            { text: "Mental Method for Solving Puzzles", correctCategory: "not_patentable" }
+                        ],
+                        hard: [
+                            { text: "Software-Controlled Washing Machine Cycle", correctCategory: "patentable" },
+                            { text: "Business Method for Online Advertising", correctCategory: "not_patentable" },
+                            { text: "Autonomous Drone Navigation Hardware", correctCategory: "patentable" },
+                            { text: "Presentation of Information on a Screen", correctCategory: "not_patentable" },
+                            { text: "Smart Irrigation System Using Sensors", correctCategory: "patentable" },
+                            { text: "Rule Set for a Board Game", correctCategory: "not_patentable" }
+                        ]
+                    }
                 }
             },
             {
@@ -104,11 +122,55 @@ export const modulesData = [
                 title: 'IP Detective',
                 description: 'Deduce the IP type based on climbing clues.',
                 data: {
-                    correctId: 'fair_use',
-                    clues: [
-                        "I am not a right granted to the creator, but a limitation on their rights.",
-                        "I allow you to use protected works without permission for criticism or education.",
-                        "Parody and News Reporting heavily rely on me."
+                    scenarios: [
+                        {
+                            correctId: 'fair_use',
+                            clues: [
+                                "I am not a right granted to the creator, but a limitation on their rights.",
+                                "I allow you to use protected works without permission for criticism or education.",
+                                "Parody and News Reporting heavily rely on me."
+                            ]
+                        },
+                        {
+                            correctId: 'patent',
+                            clues: [
+                                "I protect new inventions and functional improvements.",
+                                "My protection typically lasts for 20 years from filing.",
+                                "To get me, you must prove your idea is novel, useful, and non-obvious."
+                            ]
+                        },
+                        {
+                            correctId: 'trademark',
+                            clues: [
+                                "I protect brand names, logos, and slogans.",
+                                "I can last forever as long as I am used in commerce and renewed.",
+                                "I help consumers distinguish one company's goods from another."
+                            ]
+                        },
+                        {
+                            correctId: 'trade_secret',
+                            clues: [
+                                "I protect confidential business information.",
+                                "I have no expiration date, but once leaked, I am gone forever.",
+                                "The recipe for Coca-Cola is a famous example of me."
+                            ]
+                        },
+                        {
+                            correctId: 'public_domain',
+                            clues: [
+                                "I belong to everyone; no one owns me.",
+                                "Old works enter my realm after their copyright expires.",
+                                "You can use me freely without asking for permission."
+                            ]
+                        },
+                        {
+                            correctId: 'copyright',
+                            clues: [
+                                "I automatically protect original artistic and literary works upon creation.",
+                                "I give the creator exclusive rights to reproduce and perform their work.",
+                                "For individuals, I last for the life of the author plus 70 years."
+                            ]
+                        }
                     ],
                     characters: [
                         { id: 'copyright', name: 'Copyright', icon: '©️' },

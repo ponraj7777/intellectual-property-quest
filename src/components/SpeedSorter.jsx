@@ -2,16 +2,35 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, ArrowRight, Trophy, Timer } from 'lucide-react';
 import { useGame } from '../hooks/useGame';
+import { modulesData } from '../data/modules';
 
-const SpeedSorter = ({ gameData, moduleId, onComplete }) => {
+const SpeedSorter = ({ gameData, moduleId, levelIndex, difficulty = 'easy', onComplete }) => {
     const [currentIndex, setCurrentIndex] = useState(0);
     const [score, setScore] = useState(0);
-    const [timeLeft, setTimeLeft] = useState(30);
+    const [timeLeft, setTimeLeft] = useState(() => {
+        if (difficulty === 'hard') return 15;
+        if (difficulty === 'medium') return 20;
+        return 30;
+    });
     const [gameState, setGameState] = useState('intro'); // intro, playing, finished
     const [feedback, setFeedback] = useState(null); // 'correct' | 'wrong'
 
-    const { addXp, completeModule } = useGame();
-    const currentItem = gameData.items[currentIndex];
+    const { addXp, completeLevel, completeModule } = useGame();
+
+    // Safety check for gameData
+    if (!gameData || !gameData.items) {
+        return (
+            <div className="glass-panel p-8 rounded-2xl text-center">
+                <h2 className="text-2xl font-bold mb-4 text-red-500">Game Data Error</h2>
+                <p className="mb-6 text-quest-muted">Sorry, the game data could not be loaded.</p>
+                <button onClick={() => window.location.reload()} className="btn-primary">Back</button>
+            </div>
+        );
+    }
+
+    // Support both single array items and difficulty-based items
+    const items = Array.isArray(gameData.items) ? gameData.items : gameData.items[difficulty] || [];
+    const currentItem = items[currentIndex];
 
     useEffect(() => {
         let timer;
@@ -29,14 +48,14 @@ const SpeedSorter = ({ gameData, moduleId, onComplete }) => {
         if (isCorrect) {
             setScore(prev => prev + 10);
             setFeedback('correct');
-            addXp(10); // Instant XP reward
+            addXp(difficulty === 'hard' ? 20 : difficulty === 'medium' ? 15 : 10);
         } else {
             setFeedback('wrong');
         }
 
         setTimeout(() => {
             setFeedback(null);
-            if (currentIndex < gameData.items.length - 1) {
+            if (currentIndex < items.length - 1) {
                 setCurrentIndex(prev => prev + 1);
             } else {
                 finishGame();
@@ -46,8 +65,14 @@ const SpeedSorter = ({ gameData, moduleId, onComplete }) => {
 
     const finishGame = () => {
         setGameState('finished');
-        if (score > 50) { // arbitrary threshold
-            completeModule(moduleId);
+        if (score > 5) { // Threshold for success
+            completeLevel(moduleId, levelIndex, difficulty);
+
+            // If it's the last level AND hard difficulty, complete the module
+            const module = modulesData.find(m => m.id === moduleId);
+            if (levelIndex === module.games.length - 1 && difficulty === 'hard') {
+                completeModule(moduleId);
+            }
         }
     };
 
@@ -58,6 +83,14 @@ const SpeedSorter = ({ gameData, moduleId, onComplete }) => {
                 <p className="mb-6 text-quest-muted">
                     Sort items into <strong className="text-quest-primary">{gameData.categories.left.label}</strong> (Left) or <strong className="text-quest-secondary">{gameData.categories.right.label}</strong> (Right) as fast as you can!
                 </p>
+                <div className="flex justify-center gap-4 mb-8">
+                    <span className="px-3 py-1 rounded bg-quest-primary/10 text-quest-primary text-[10px] font-black uppercase tracking-widest border border-quest-primary/20">
+                        Difficulty: {difficulty}
+                    </span>
+                    <span className="px-3 py-1 rounded bg-white/5 text-quest-muted text-[10px] font-black uppercase tracking-widest border border-white/10">
+                        Time: {timeLeft}s
+                    </span>
+                </div>
                 <button onClick={() => setGameState('playing')} className="btn-primary">
                     Start Game
                 </button>
@@ -69,7 +102,7 @@ const SpeedSorter = ({ gameData, moduleId, onComplete }) => {
         return (
             <div className="glass-panel p-8 rounded-2xl text-center">
                 <Trophy className="w-16 h-16 text-yellow-500 mx-auto mb-4" />
-                <h3 className="text-2xl font-bold mb-2">Time's Up!</h3>
+                <h3 className="text-2xl font-bold mb-2">Game Completed!</h3>
                 <p className="text-xl mb-6">Final Score: <span className="text-quest-primary font-bold">{score}</span></p>
                 <button onClick={() => window.location.reload()} className="btn-primary">
                     Play Again
@@ -102,7 +135,7 @@ const SpeedSorter = ({ gameData, moduleId, onComplete }) => {
                         key={currentIndex}
                         initial={{ scale: 0.8, opacity: 0, y: 50 }}
                         animate={{ scale: 1, opacity: 1, y: 0 }}
-                        exit={{ scale: 0.8, opacity: 0, x: feedback === 'correct' ? 0 : (Math.random() > 0.5 ? 100 : -100) }} // Simple exit animation
+                        exit={{ scale: 0.8, opacity: 0, x: feedback === 'correct' ? 200 : -200 }}
                         className={`w-64 h-64 bg-quest-card border-2 flex items-center justify-center p-6 rounded-xl shadow-2xl z-10 text-center
                     ${feedback === 'correct' ? 'border-green-500 bg-green-500/10' :
                                 feedback === 'wrong' ? 'border-red-500 bg-red-500/10' : 'border-white/10'}

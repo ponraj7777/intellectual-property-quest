@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useParams, Link, useLocation } from 'react-router-dom';
 import { modulesData } from '../data/modules';
-import { ArrowLeft, BookOpen, Clock, Award, Play, ChevronRight, Calculator, List, RotateCw, HelpCircle } from 'lucide-react';
+import { ArrowLeft, BookOpen, Award, ChevronRight, Calculator, List, RotateCw, HelpCircle, Lock } from 'lucide-react';
 import { motion } from 'framer-motion';
 import Quiz from '../components/Quiz';
 import SpeedSorter from '../components/SpeedSorter';
@@ -12,18 +12,29 @@ import { useGame } from '../hooks/useGame';
 
 const ModuleDetail = () => {
     const { moduleId } = useParams();
+    const location = useLocation();
     const module = modulesData.find(m => m.id === moduleId);
-    const { completedModules } = useGame();
+    const { completedModules, isLevelUnlocked } = useGame();
 
-    const [activeGameIndex, setActiveGameIndex] = useState(null); // null = selection screen
+    const [activeGameIndex, setActiveGameIndex] = useState(null);
+    const [difficulty, setDifficulty] = useState('easy');
 
-    const isCompleted = module && completedModules.includes(module.id);
+    useEffect(() => {
+        if (location.state?.activeLevel !== undefined) {
+            setActiveGameIndex(location.state.activeLevel);
+        }
+        if (location.state?.difficulty) {
+            setDifficulty(location.state.difficulty);
+        }
+    }, [location.state]);
+
+    const isModuleCompleted = module && completedModules.includes(module.id);
 
     if (!module) {
         return (
             <div className="container mx-auto px-4 py-20 text-center">
                 <h2 className="text-3xl font-bold mb-4">Module Not Found</h2>
-                <Link to="/modules" className="text-quest-primary hover:underline">Back to Modules</Link>
+                <Link to="/roadmap" className="text-quest-primary hover:underline">Back to Journey</Link>
             </div>
         );
     }
@@ -31,9 +42,9 @@ const ModuleDetail = () => {
     const activeGame = activeGameIndex !== null ? module.games[activeGameIndex] : null;
 
     return (
-        <div className="container mx-auto px-4 py-12">
-            <Link to="/modules" className="inline-flex items-center text-quest-muted hover:text-white mb-8 transition-colors">
-                <ArrowLeft className="w-4 h-4 mr-2" /> Back to Modules
+        <div className="container mx-auto px-4 pt-32 pb-12">
+            <Link to="/roadmap" className="inline-flex items-center text-quest-muted hover:text-white mb-8 transition-colors">
+                <ArrowLeft className="w-4 h-4 mr-2" /> Back to Journey
             </Link>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -55,11 +66,11 @@ const ModuleDetail = () => {
                         <div className="space-y-4 mb-8">
                             <div className="flex items-center text-sm text-quest-muted">
                                 <BookOpen className="w-4 h-4 mr-3" />
-                                <span>{module.games.length} Learning Games</span>
+                                <span>{module.games.length} Challenge Nodes</span>
                             </div>
                             <div className="flex items-center text-sm text-quest-muted">
-                                <Award className={`w-4 h-4 mr-3 ${isCompleted ? 'text-yellow-500' : ''}`} />
-                                <span>{isCompleted ? 'Badge Earned' : 'Complete to Earn Badge'}</span>
+                                <Award className={`w-4 h-4 mr-3 ${isModuleCompleted ? 'text-yellow-500' : ''}`} />
+                                <span>{isModuleCompleted ? 'Module Mastery Earned' : 'Complete all to Earn Badge'}</span>
                             </div>
                         </div>
 
@@ -68,7 +79,7 @@ const ModuleDetail = () => {
                                 onClick={() => setActiveGameIndex(null)}
                                 className="w-full py-2 border border-white/10 rounded-lg hover:bg-white/5 transition-colors text-sm"
                             >
-                                Change Game
+                                Explorer Mode (All Levels)
                             </button>
                         )}
                     </div>
@@ -84,65 +95,106 @@ const ModuleDetail = () => {
                     {activeGameIndex === null ? (
                         // Game Selection Screen
                         <div className="space-y-6">
-                            <h2 className="text-2xl font-bold">Choose a Challenge</h2>
+                            <div className="flex items-center justify-between">
+                                <h2 className="text-2xl font-bold uppercase tracking-wider">Level Select</h2>
+                                <div className="flex bg-white/5 p-1 rounded-xl border border-white/10">
+                                    {['easy', 'medium', 'hard'].map((d) => (
+                                        <button
+                                            key={d}
+                                            onClick={() => setDifficulty(d)}
+                                            className={`px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all
+                                                ${difficulty === d ? 'bg-quest-primary text-white shadow-lg' : 'text-quest-muted hover:text-white'}
+                                            `}
+                                        >
+                                            {d}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
                             <div className="grid grid-cols-1 gap-4">
-                                {module.games.map((game, index) => (
-                                    <button
-                                        key={index}
-                                        onClick={() => setActiveGameIndex(index)}
-                                        className="glass-panel p-6 rounded-xl text-left hover:border-quest-primary/50 transition-all group flex items-center justify-between"
-                                    >
-                                        <div className="flex items-center gap-4">
-                                            <div className={`p-3 rounded-lg ${game.type === 'quiz' ? 'bg-blue-500/20 text-blue-400' :
-                                                    game.type === 'sorter' ? 'bg-emerald-500/20 text-emerald-400' :
-                                                        game.type === 'match' ? 'bg-purple-500/20 text-purple-400' :
-                                                            game.type === 'spin' ? 'bg-orange-500/20 text-orange-400' :
-                                                                'bg-pink-500/20 text-pink-400'
-                                                }`}>
-                                                {game.type === 'quiz' && <List className="w-6 h-6" />}
-                                                {game.type === 'sorter' && <Calculator className="w-6 h-6" />}
-                                                {game.type === 'match' && <List className="w-6 h-6" />}
-                                                {game.type === 'spin' && <RotateCw className="w-6 h-6" />}
-                                                {game.type === 'guess' && <HelpCircle className="w-6 h-6" />}
+                                {module.games.map((game, index) => {
+                                    const unlocked = isLevelUnlocked(module.id, index, difficulty);
+                                    return (
+                                        <button
+                                            key={index}
+                                            disabled={!unlocked}
+                                            onClick={() => setActiveGameIndex(index)}
+                                            className={`glass-panel p-6 rounded-xl text-left transition-all group flex items-center justify-between
+                                                ${unlocked ? 'hover:border-quest-primary/50' : 'opacity-60 grayscale cursor-not-allowed'}
+                                            `}
+                                        >
+                                            <div className="flex items-center gap-4">
+                                                <div className={`p-4 rounded-xl ${!unlocked ? 'bg-white/5 text-white/20' :
+                                                    game.type === 'quiz' ? 'bg-blue-500/20 text-blue-400' :
+                                                        game.type === 'sorter' ? 'bg-emerald-500/20 text-emerald-400' :
+                                                            game.type === 'match' ? 'bg-purple-500/20 text-purple-400' :
+                                                                game.type === 'spin' ? 'bg-orange-500/20 text-orange-400' :
+                                                                    'bg-pink-500/20 text-pink-400'
+                                                    }`}>
+                                                    {!unlocked ? <Lock className="w-6 h-6" /> : (
+                                                        <>
+                                                            {game.type === 'quiz' && <List className="w-6 h-6" />}
+                                                            {game.type === 'sorter' && <Calculator className="w-6 h-6" />}
+                                                            {game.type === 'match' && <List className="w-6 h-6" />}
+                                                            {game.type === 'spin' && <RotateCw className="w-6 h-6" />}
+                                                            {game.type === 'guess' && <HelpCircle className="w-6 h-6" />}
+                                                        </>
+                                                    )}
+                                                </div>
+                                                <div>
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="text-[10px] font-black uppercase tracking-widest text-quest-muted">Challenge {index + 1}</span>
+                                                        <span className={`text-[10px] px-1.5 py-0.5 rounded font-bold uppercase ${!unlocked ? 'bg-red-500/10 text-red-400' : 'bg-quest-primary/10 text-quest-primary'
+                                                            }`}>
+                                                            {difficulty} {unlocked ? 'Unlocked' : 'Locked'}
+                                                        </span>
+                                                    </div>
+                                                    <h3 className={`text-lg font-bold transition-colors ${unlocked ? 'group-hover:text-quest-primary' : 'text-white/30'}`}>
+                                                        {game.title}
+                                                    </h3>
+                                                    <p className="text-sm text-quest-muted">{unlocked ? game.description : 'Complete previous difficulty/XP threshold to unlock'}</p>
+                                                </div>
                                             </div>
-                                            <div>
-                                                <h3 className="text-lg font-bold group-hover:text-quest-primary transition-colors">{game.title}</h3>
-                                                <p className="text-sm text-quest-muted">{game.description}</p>
-                                            </div>
-                                        </div>
-                                        <ChevronRight className="w-5 h-5 text-quest-muted group-hover:translate-x-1 transition-transform" />
-                                    </button>
-                                ))}
+                                            {unlocked && <ChevronRight className="w-5 h-5 text-quest-muted group-hover:translate-x-1 transition-transform" />}
+                                        </button>
+                                    );
+                                })}
                             </div>
                         </div>
                     ) : (
                         // Active Game Screen
                         <div>
-                            <div className="mb-4 flex items-center gap-2 text-quest-muted text-sm">
-                                <span
-                                    onClick={() => setActiveGameIndex(null)}
-                                    className="cursor-pointer hover:text-white hover:underline"
-                                >
-                                    Games
-                                </span>
-                                <ChevronRight className="w-3 h-3" />
-                                <span className="text-quest-primary">{activeGame.title}</span>
+                            <div className="mb-4 flex items-center justify-between">
+                                <div className="flex items-center gap-2 text-quest-muted text-sm">
+                                    <span
+                                        onClick={() => setActiveGameIndex(null)}
+                                        className="cursor-pointer hover:text-white hover:underline"
+                                    >
+                                        Back to Select
+                                    </span>
+                                    <ChevronRight className="w-3 h-3" />
+                                    <span className="text-quest-primary">{activeGame.title}</span>
+                                    <div className={`ml-2 px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-widest border border-quest-primary/30 text-quest-primary`}>
+                                        {difficulty}
+                                    </div>
+                                </div>
+                                <div className="text-xs font-bold text-quest-muted uppercase tracking-wider">Node {activeGameIndex + 1} of {module.games.length}</div>
                             </div>
 
                             {activeGame.type === 'quiz' && (
-                                <Quiz questions={activeGame.data.questions} moduleId={module.id} />
+                                <Quiz questions={activeGame.data.questions} moduleId={module.id} levelIndex={activeGameIndex} difficulty={difficulty} />
                             )}
                             {activeGame.type === 'sorter' && (
-                                <SpeedSorter gameData={activeGame.data} moduleId={module.id} />
+                                <SpeedSorter gameData={activeGame.data} moduleId={module.id} levelIndex={activeGameIndex} difficulty={difficulty} />
                             )}
                             {activeGame.type === 'match' && (
-                                <TermMatch gameData={activeGame.data} moduleId={module.id} />
+                                <TermMatch gameData={activeGame.data} moduleId={module.id} levelIndex={activeGameIndex} difficulty={difficulty} />
                             )}
                             {activeGame.type === 'spin' && (
-                                <SpinWheel gameData={activeGame.data} moduleId={module.id} />
+                                <SpinWheel gameData={activeGame.data} moduleId={module.id} levelIndex={activeGameIndex} difficulty={difficulty} />
                             )}
                             {activeGame.type === 'guess' && (
-                                <GuessTheIP gameData={activeGame.data} moduleId={module.id} />
+                                <GuessTheIP gameData={activeGame.data} moduleId={module.id} levelIndex={activeGameIndex} difficulty={difficulty} />
                             )}
                         </div>
                     )}

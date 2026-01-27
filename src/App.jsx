@@ -8,6 +8,9 @@ import Home from './pages/Home';
 import Modules from './pages/Modules';
 import ModuleDetail from './pages/ModuleDetail';
 import Leaderboard from './pages/Leaderboard';
+import Login from './pages/Login';
+import Signup from './pages/Signup';
+import Roadmap from './pages/Roadmap';
 
 import { GameProvider } from './hooks/useGame';
 
@@ -22,9 +25,12 @@ function App() {
           <main className="flex-grow">
             <Routes>
               <Route path="/" element={<Home />} />
+              <Route path="/roadmap" element={<Roadmap />} />
               <Route path="/modules" element={<Modules />} />
               <Route path="/modules/:moduleId" element={<ModuleDetail />} />
               <Route path="/leaderboard" element={<Leaderboard />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/signup" element={<Signup />} />
             </Routes>
           </main>
 

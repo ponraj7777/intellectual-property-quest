@@ -16,7 +16,7 @@ const Leaderboard = () => {
     ];
 
     return (
-        <div className="container mx-auto px-4 py-12">
+        <div className="container mx-auto px-4 pt-32 pb-12">
             <div className="text-center mb-12">
                 <h1 className="text-4xl md:text-5xl font-heading font-bold mb-4">
                     Quest <span className="text-gradient">Leaderboard</span>
@@ -56,8 +56,8 @@ const Leaderboard = () => {
                             <div key={index} className="flex items-center justify-between p-6 hover:bg-white/5 transition-colors">
                                 <div className="flex items-center gap-6">
                                     <div className={`w-8 h-8 flex items-center justify-center font-bold text-lg ${index === 0 ? 'text-yellow-400' :
-                                            index === 1 ? 'text-gray-300' :
-                                                index === 2 ? 'text-amber-600' : 'text-quest-muted'
+                                        index === 1 ? 'text-gray-300' :
+                                            index === 2 ? 'text-amber-600' : 'text-quest-muted'
                                         }`}>
                                         {index + 1}
                                     </div>

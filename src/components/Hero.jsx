@@ -2,8 +2,11 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { ArrowRight, Shield, Award, BookOpen } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useGame } from '../hooks/useGame';
 
 const Hero = () => {
+    const { user } = useGame();
+    const startPath = user ? "/modules" : "/login";
     return (
         <div className="relative overflow-hidden pt-20 pb-32">
             {/* Background Elements */}
@@ -32,7 +35,7 @@ const Hero = () => {
                         </p>
 
                         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-                            <Link to="/modules" className="btn-primary flex items-center gap-2 group w-full sm:w-auto justify-center">
+                            <Link to={startPath} className="btn-primary flex items-center gap-2 group w-full sm:w-auto justify-center">
                                 Start Your Quest
                                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                             </Link>

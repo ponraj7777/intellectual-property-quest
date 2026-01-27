@@ -2,15 +2,16 @@ import React, { useState } from 'react';
 import { motion, useAnimation } from 'framer-motion';
 import { Trophy, ArrowDown } from 'lucide-react';
 import { useGame } from '../hooks/useGame';
+import { modulesData } from '../data/modules';
 
-const SpinWheel = ({ gameData, moduleId, onComplete }) => {
+const SpinWheel = ({ gameData, moduleId, levelIndex, difficulty = 'easy', onComplete }) => {
     const [isSpinning, setIsSpinning] = useState(false);
     const [result, setResult] = useState(null);
     const [showQuestion, setShowQuestion] = useState(false);
     const [answered, setAnswered] = useState(false);
     const [feedback, setFeedback] = useState(null);
     const controls = useAnimation();
-    const { addXp, completeModule } = useGame();
+    const { addXp, completeLevel, completeModule } = useGame();
 
     const segments = gameData.segments;
     const numSegments = segments.length;
@@ -71,8 +72,15 @@ const SpinWheel = ({ gameData, moduleId, onComplete }) => {
 
         if (optionIndex === result.question.correctAnswer) {
             setFeedback('correct');
-            addXp(50);
-            setTimeout(() => completeModule(moduleId), 1500);
+            addXp(difficulty === 'hard' ? 150 : difficulty === 'medium' ? 100 : 50);
+
+            // Level completion logic
+            completeLevel(moduleId, levelIndex, difficulty);
+
+            const module = modulesData.find(m => m.id === moduleId);
+            if (levelIndex === module.games.length - 1 && difficulty === 'hard') {
+                completeModule(moduleId);
+            }
         } else {
             setFeedback('wrong');
         }
@@ -84,6 +92,9 @@ const SpinWheel = ({ gameData, moduleId, onComplete }) => {
                 <Trophy className="w-16 h-16 text-yellow-500 mx-auto mb-4" />
                 <h3 className="text-2xl font-bold mb-2">Correct!</h3>
                 <p className="text-xl mb-6">You mastered the topic: <span className="text-quest-primary">{result.label}</span></p>
+                <div className="flex justify-center gap-4 mb-8 text-xs font-bold font-mono opacity-50 uppercase tracking-tighter">
+                    <span>Difficulty Cleared: {difficulty}</span>
+                </div>
                 <button onClick={() => window.location.reload()} className="btn-primary">
                     Play Again
                 </button>
@@ -178,7 +189,7 @@ const SpinWheel = ({ gameData, moduleId, onComplete }) => {
                     className="w-full"
                 >
                     <div className="text-center mb-6">
-                        <span className="text-sm text-quest-muted uppercase tracking-wider">Topic Selected</span>
+                        <span className="text-sm text-quest-muted uppercase tracking-wider">Topic Selected ({difficulty})</span>
                         <h3 className="text-2xl font-bold text-quest-primary">{result.label}</h3>
                     </div>
 
