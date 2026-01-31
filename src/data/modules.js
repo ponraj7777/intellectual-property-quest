@@ -181,6 +181,20 @@ export const modulesData = [
                         { id: 'fair_use', name: 'Fair Use', icon: '⚖️' }
                     ]
                 }
+            },
+            {
+                type: 'snake',
+                title: 'Copyright Climb',
+                description: 'Climb the ladder of rights by answering copyright questions correctly.',
+                data: {
+                    questions: [
+                        { text: "Which of these is protected by Copyright?", options: ["A new engine design", "A textbook on IP law", "A secret recipe", "A brand logo"], correctAnswer: 1 },
+                        { text: "How long does individual copyright last?", options: ["20 years", "Life + 70 years", "Forever", "10 years"], correctAnswer: 1 },
+                        { text: "When is copyright protection granted?", options: ["Upon registration", "Upon creation", "Upon publication", "After 1 year"], correctAnswer: 1 },
+                        { text: "Is software code copyrightable?", options: ["No, it's a patent", "Yes, as a literary work", "Only if it's open source", "Only if registered"], correctAnswer: 1 },
+                        { text: "What is 'Fair Use'?", options: ["Free use for everyone", "Limited use without permission", "Selling others' work", "Copyright expiration"], correctAnswer: 1 }
+                    ]
+                }
             }
         ]
     },

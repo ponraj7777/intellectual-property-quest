@@ -14,7 +14,6 @@ const Hero = () => {
                 <div className="absolute top-20 left-10 w-72 h-72 bg-quest-primary/20 rounded-full blur-3xl rounded-full mix-blend-screen" />
                 <div className="absolute top-40 right-10 w-96 h-96 bg-quest-accent/20 rounded-full blur-3xl mix-blend-screen" />
             </div>
-
             <div className="container mx-auto px-4 relative z-10">
                 <div className="max-w-4xl mx-auto text-center">
                     <motion.div

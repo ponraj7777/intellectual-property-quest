@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useLocation } from 'react-router-dom';
 import { modulesData } from '../data/modules';
-import { ArrowLeft, BookOpen, Award, ChevronRight, Calculator, List, RotateCw, HelpCircle, Lock } from 'lucide-react';
+import { ArrowLeft, BookOpen, Award, ChevronRight, Calculator, List, RotateCw, HelpCircle, Lock, Trophy } from 'lucide-react';
 import { motion } from 'framer-motion';
 import Quiz from '../components/Quiz';
 import SpeedSorter from '../components/SpeedSorter';
 import TermMatch from '../components/TermMatch';
 import SpinWheel from '../components/SpinWheel';
 import GuessTheIP from '../components/GuessTheIP';
+import Snakeandladder from '../components/Snakeandladder';
 import { useGame } from '../hooks/useGame';
 
 const ModuleDetail = () => {
@@ -129,7 +130,8 @@ const ModuleDetail = () => {
                                                         game.type === 'sorter' ? 'bg-emerald-500/20 text-emerald-400' :
                                                             game.type === 'match' ? 'bg-purple-500/20 text-purple-400' :
                                                                 game.type === 'spin' ? 'bg-orange-500/20 text-orange-400' :
-                                                                    'bg-pink-500/20 text-pink-400'
+                                                                    game.type === 'snake' ? 'bg-amber-500/20 text-amber-400' :
+                                                                        'bg-pink-500/20 text-pink-400'
                                                     }`}>
                                                     {!unlocked ? <Lock className="w-6 h-6" /> : (
                                                         <>
@@ -138,6 +140,7 @@ const ModuleDetail = () => {
                                                             {game.type === 'match' && <List className="w-6 h-6" />}
                                                             {game.type === 'spin' && <RotateCw className="w-6 h-6" />}
                                                             {game.type === 'guess' && <HelpCircle className="w-6 h-6" />}
+                                                            {game.type === 'snake' && <Trophy className="w-6 h-6" />}
                                                         </>
                                                     )}
                                                 </div>
@@ -208,6 +211,9 @@ const ModuleDetail = () => {
                             )}
                             {activeGame.type === 'guess' && (
                                 <GuessTheIP gameData={activeGame.data} moduleId={module.id} levelIndex={activeGameIndex} difficulty={difficulty} />
+                            )}
+                            {activeGame.type === 'snake' && (
+                                <Snakeandladder gameData={activeGame.data} moduleId={module.id} levelIndex={activeGameIndex} difficulty={difficulty} />
                             )}
                         </div>
                     )}
