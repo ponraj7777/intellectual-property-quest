@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Toaster } from 'sonner';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
+import MeshBackground from './components/MeshBackground';
 
 import Home from './pages/Home';
 import Modules from './pages/Modules';
@@ -18,7 +19,8 @@ function App() {
   return (
     <GameProvider>
       <Router>
-        <div className="min-h-screen bg-quest-dark text-white font-sans selection:bg-quest-primary selection:text-white flex flex-col">
+        <div className="min-h-screen text-white font-sans selection:bg-quest-primary selection:text-white flex flex-col relative">
+          <MeshBackground />
           <Toaster theme="dark" position="top-center" />
           <Navbar />
 

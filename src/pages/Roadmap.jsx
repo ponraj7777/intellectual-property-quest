@@ -118,7 +118,7 @@ const Roadmap = () => {
                         </div>
 
                         {/* Level Path - Zig Zag Flow */}
-                        <div className="flex flex-col items-center gap-[100px] py-10 w-full max-w-3xl mx-auto">
+                        <div className="flex flex-col items-center py-10 w-full max-w-[768px] mx-auto overflow-visible">
                             {['easy', 'medium', 'hard'].map((difficulty, index) => {
                                 const isLocked = !isLevelUnlocked(activeModule.id, 0, difficulty);
                                 const totalInDifficulty = activeModule.games.length;
@@ -132,7 +132,7 @@ const Roadmap = () => {
 
                                 return (
                                     <React.Fragment key={difficulty}>
-                                        <div className={`flex items-center w-full px-4 md:px-0 relative z-10 ${isEven ? 'justify-start md:flex-row' : 'justify-end md:flex-row-reverse'}`}>
+                                        <div className={`flex items-center w-full px-4 md:px-0 relative z-10 justify-start ${isEven ? 'md:flex-row' : 'md:flex-row-reverse'}`}>
                                             {/* Node */}
                                             <div className="flex-shrink-0">
                                                 <RoadmapNode

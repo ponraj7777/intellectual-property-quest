@@ -15,17 +15,17 @@ const RoadmapNode = ({ level, gameTitle, status, onSelect, colorClass }) => {
                     className={`
                         w-16 h-16 rounded-full flex items-center justify-center border-4 transition-all duration-300 relative
                         ${isCompleted
-                            ? `bg-white/10 ${colorClass.replace('text-', 'border-')} border-solid shadow-xl shadow-${colorClass.split('-')[1]}-500/40`
+                            ? `bg-white/10 ${colorClass.replace('text-', 'border-')} border-solid shadow-xl shadow-${colorClass.split('-')[1]}-500/40 opacity-100`
                             : isLocked
-                                ? 'bg-white/5 border-white/10 opacity-40 cursor-not-allowed'
-                                : `bg-white/5 border-white/20 hover:border-${colorClass.split('-')[1]}-400`
+                                ? 'bg-white/10 border-white/40 opacity-90 cursor-not-allowed'
+                                : `bg-white/5 border-white/60 hover:border-${colorClass.split('-')[1]}-400 opacity-100`
                         }
                     `}
                 >
                     {isLocked ? (
-                        <Lock className="w-6 h-6 text-white/20" />
+                        <Lock className="w-6 h-6 text-white/40" />
                     ) : (
-                        <span className="text-sm font-black uppercase tracking-tighter">{level.substring(0, 1)}</span>
+                        <span className="text-sm font-black uppercase tracking-tighter text-white">{level.substring(0, 1)}</span>
                     )}
 
                     {/* Completion Ring */}
@@ -49,12 +49,16 @@ const RoadmapNode = ({ level, gameTitle, status, onSelect, colorClass }) => {
                     </svg>
                 </motion.button>
             </motion.div>
-            <span className="mt-4 text-[10px] font-black uppercase tracking-[0.2em] text-quest-muted">
-                {level}
-            </span>
-            <span className="text-[8px] font-bold text-quest-primary/60 uppercase">
-                {gameTitle}
-            </span>
+
+            {/* Labels - Absolute positioned to not interfere with Path spacing */}
+            <div className={`absolute top-20 flex flex-col items-center pointer-events-none w-max transition-opacity duration-500 ${isLocked ? 'opacity-60' : 'opacity-100'}`}>
+                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-quest-muted">
+                    {level}
+                </span>
+                <span className="text-[8px] font-bold text-quest-primary/60 uppercase">
+                    {gameTitle}
+                </span>
+            </div>
         </div>
     );
 };

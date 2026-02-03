@@ -195,6 +195,19 @@ export const modulesData = [
                         { text: "What is 'Fair Use'?", options: ["Free use for everyone", "Limited use without permission", "Selling others' work", "Copyright expiration"], correctAnswer: 1 }
                     ]
                 }
+            },
+            {
+                type: 'archery',
+                title: 'Copyright Archer',
+                description: 'Aim and shoot at the correct copyright principles.',
+                data: {
+                    questions: [
+                        { text: "When does copyright protection begin?", options: ["Upon registration", "Upon creation", "After publication", "After 70 years"], correctAnswer: 1 },
+                        { text: "What protects original literary and artistic works?", options: ["Patents", "Trademarks", "Copyrights", "Trade Secrets"], correctAnswer: 2 },
+                        { text: "Is a parody considered 'Fair Use'?", options: ["Always", "Never", "Usually Yes", "Only if paid"], correctAnswer: 2 },
+                        { text: "How long does copyright last for an individual?", options: ["20 years", "50 years", "Life + 70 years", "Forever"], correctAnswer: 2 }
+                    ]
+                }
             }
         ]
     },

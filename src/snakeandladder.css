@@ -5,7 +5,8 @@
 }
 
 .game-header h1 {
-    @apply text-3xl font-heading font-black text-gradient mb-1;
+    @apply text-3xl font-heading font-black mb-1;
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-quest-primary via-quest-accent to-quest-secondary;
 }
 
 .game-header p {
@@ -17,7 +18,12 @@
 }
 
 .boardouter {
-    @apply glass-panel p-4 md:p-6 rounded-2xl border-white/5 bg-quest-dark/40;
+    /* NEW: Aurora UI */
+    @apply bg-white/5 backdrop-blur-xl border border-white/10 shadow-2xl p-4 md:p-6 rounded-2xl border-white/5 bg-white/5;
+
+    /* BACKUP: Previous UI
+    @apply bg-quest-card/60 backdrop-blur-md border border-white/10 shadow-xl p-4 md:p-6 rounded-2xl border-white/5 bg-quest-dark/40;
+    */
 }
 
 .BoardInfo {
@@ -59,19 +65,114 @@
     @apply stroke-emerald-300 stroke-[2] opacity-40;
 }
 
-.conn-line.snake.body {
-    @apply stroke-rose-500 stroke-[10] fill-none;
-    filter: drop-shadow(0 0 12px rgba(244, 63, 94, 0.4));
+/* Snake Color Variations */
+.snake-rose .body-outer {
+    @apply stroke-rose-600/80;
+    filter: drop-shadow(0 0 8px rgba(225, 29, 72, 0.4));
 }
 
-.conn-line.snake.head {
-    @apply fill-rose-500 stroke-rose-300 stroke-2;
+.snake-rose .body-inner,
+.snake-rose .snake-head,
+.snake-rose .snake-tongue {
+    @apply stroke-rose-400 fill-rose-600;
+}
+
+.snake-rose .snake-head {
+    @apply fill-rose-600;
+}
+
+.snake-amber .body-outer {
+    @apply stroke-amber-600/80;
+    filter: drop-shadow(0 0 8px rgba(217, 119, 6, 0.4));
+}
+
+.snake-amber .body-inner,
+.snake-amber .snake-head,
+.snake-amber .snake-tongue {
+    @apply stroke-amber-400 fill-amber-600;
+}
+
+.snake-amber .snake-head {
+    @apply fill-amber-600;
+}
+
+.snake-orange .body-outer {
+    @apply stroke-orange-600/80;
+    filter: drop-shadow(0 0 8px rgba(234, 88, 12, 0.4));
+}
+
+.snake-orange .body-inner,
+.snake-orange .snake-head,
+.snake-orange .snake-tongue {
+    @apply stroke-orange-400 fill-orange-600;
+}
+
+.snake-orange .snake-head {
+    @apply fill-orange-600;
+}
+
+.snake-purple .body-outer {
+    @apply stroke-purple-600/80;
+    filter: drop-shadow(0 0 8px rgba(147, 51, 234, 0.4));
+}
+
+.snake-purple .body-inner,
+.snake-purple .snake-head,
+.snake-purple .snake-tongue {
+    @apply stroke-purple-400 fill-purple-600;
+}
+
+.snake-purple .snake-head {
+    @apply fill-purple-600;
+}
+
+.conn-line.snake.body-outer {
+    @apply fill-none stroke-[12];
+    stroke-linecap: round;
+}
+
+.conn-line.snake.body-inner {
+    @apply fill-none stroke-[4];
+    stroke-linecap: round;
+    stroke-dasharray: 2 8;
+}
+
+.snake-head {
+    @apply stroke-1;
+}
+
+.snake-eye {
+    @apply fill-yellow-400;
+    filter: drop-shadow(0 0 3px rgba(250, 204, 21, 0.8));
+}
+
+.snake-tongue {
+    @apply fill-none stroke-[1.5];
+    animation: tongue-flick 0.3s ease-in-out infinite alternate;
+    transform-origin: 8px 0;
+}
+
+@keyframes tongue-flick {
+    0% {
+        transform: scaleX(1);
+    }
+
+    100% {
+        transform: scaleX(1.3);
+    }
 }
 
 .cell {
+    /* NEW: Aurora UI */
+    @apply aspect-square rounded-lg flex items-center justify-center relative transition-all duration-200 border-2 border-white/5;
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(8px);
+
+    /* BACKUP: Previous UI
     @apply aspect-square rounded-lg flex items-center justify-center relative transition-all duration-200 border-2 border-white/10;
     background: rgba(15, 23, 42, 0.85);
     backdrop-filter: blur(4px);
+    */
 }
 
 .cell-blue {
@@ -122,7 +223,7 @@
 }
 
 .stats {
-    @apply glass-panel p-4 rounded-xl grid grid-cols-3 gap-2 text-center border-white/5;
+    @apply bg-white/5 backdrop-blur-xl border border-white/10 shadow-2xl p-4 rounded-xl grid grid-cols-3 gap-2 text-center border-white/5;
 }
 
 .stats h2 {
@@ -134,7 +235,7 @@
 }
 
 .dice-box {
-    @apply glass-panel p-6 rounded-xl text-center border-white/5 space-y-4;
+    @apply bg-white/5 backdrop-blur-xl border border-white/10 shadow-2xl p-6 rounded-xl text-center border-white/5 space-y-4;
 }
 
 .dice-visual {
@@ -164,7 +265,7 @@
 }
 
 .question-box {
-    @apply glass-panel p-6 rounded-xl border-quest-primary/20 space-y-4 animate-fade-in;
+    @apply bg-white/5 backdrop-blur-xl border border-white/10 shadow-2xl p-6 rounded-xl border-quest-primary/20 space-y-4 animate-fade-in;
 }
 
 .question-box h3 {
@@ -188,7 +289,7 @@
 }
 
 .rules {
-    @apply glass-panel p-6 rounded-xl border-white/5;
+    @apply bg-white/5 backdrop-blur-xl border border-white/10 shadow-2xl p-6 rounded-xl border-white/5;
 }
 
 .rules h4 {

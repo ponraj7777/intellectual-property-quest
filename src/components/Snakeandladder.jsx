@@ -249,10 +249,27 @@ export default function RightsDutiesClimb({ gameData, moduleId, levelIndex, diff
                                                          Q ${q1x} ${q1y} ${midX} ${midY} 
                                                          Q ${q2x} ${q2y} ${conn.end.x} ${conn.end.y}`;
 
+                                        // Random color for each snake
+                                        const snakeColors = ['snake-rose', 'snake-amber', 'snake-orange', 'snake-purple'];
+                                        const snakeColorClass = snakeColors[idx % snakeColors.length];
+
                                         return (
-                                            <g key={idx}>
-                                                <path d={pathData} className="conn-line snake body" />
-                                                <circle cx={conn.start.x} cy={conn.start.y} r="6" className="conn-line snake head" />
+                                            <g key={idx} className={`snake-group ${snakeColorClass}`}>
+                                                {/* Outer body */}
+                                                <path d={pathData} className="conn-line snake body-outer" />
+                                                {/* Inner pattern/belly */}
+                                                <path d={pathData} className="conn-line snake body-inner" />
+
+                                                {/* Detailed Head (No Rotation) */}
+                                                <g transform={`translate(${conn.start.x}, ${conn.start.y})`}>
+                                                    {/* Forked Tongue */}
+                                                    <path d="M 8 0 L 14 -2 M 8 0 L 14 2" className="snake-tongue" />
+                                                    {/* Head Shape */}
+                                                    <ellipse cx="4" cy="0" rx="9" ry="6" className="snake-head" />
+                                                    {/* Eyes */}
+                                                    <circle cx="6" cy="-2.5" r="1.5" className="snake-eye" />
+                                                    <circle cx="6" cy="2.5" r="1.5" className="snake-eye" />
+                                                </g>
                                             </g>
                                         );
                                     }

@@ -3,18 +3,18 @@ import { motion } from 'framer-motion';
 
 const RoadmapPath = ({ isCompleted, isFromLeft, progress = 0 }) => {
     // 768px matches the max-w-3xl container width.
-    const viewBoxWidth = 768;
-    const height = 100; // Matches the gap between nodes in Roadmap.jsx
+    // We use a normalized 100-unit coordinate system for width
+    const viewBoxWidth = 100;
+    const height = 100;
 
-    // Node is 64px (h-16). Center is 32px.
-    // Since this component is placed in the gap between nodes,
-    // we need to reach 32px UP and 32px DOWN to hit the centers.
+    // The nodes are 64px in a 768px max-width container.
+    // Center of left node is 32px from left, center of right is 736px.
+    // Percentages: (32/768)*100 = 4.1666...
+    const leftX = 4.166;
+    const rightX = 95.833;
+
     const startY = -32;
     const endY = height + 32;
-
-    const nodeRadius = 32;
-    const leftX = nodeRadius;
-    const rightX = viewBoxWidth - nodeRadius;
 
     const startX = isFromLeft ? leftX : rightX;
     const endX = isFromLeft ? rightX : leftX;
@@ -46,7 +46,7 @@ const RoadmapPath = ({ isCompleted, isFromLeft, progress = 0 }) => {
                 <path
                     d={path}
                     fill="none"
-                    stroke="rgba(255,255,255,0.08)"
+                    stroke="rgba(255,255,255,0.2)"
                     strokeWidth="6"
                     strokeLinecap="round"
                 />

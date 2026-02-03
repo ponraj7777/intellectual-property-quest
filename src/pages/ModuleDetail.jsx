@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useLocation } from 'react-router-dom';
 import { modulesData } from '../data/modules';
-import { ArrowLeft, BookOpen, Award, ChevronRight, Calculator, List, RotateCw, HelpCircle, Lock, Trophy } from 'lucide-react';
+import { ArrowLeft, BookOpen, Award, ChevronRight, Calculator, List, RotateCw, HelpCircle, Lock, Trophy, Target } from 'lucide-react';
 import { motion } from 'framer-motion';
 import Quiz from '../components/Quiz';
 import SpeedSorter from '../components/SpeedSorter';
@@ -9,6 +9,7 @@ import TermMatch from '../components/TermMatch';
 import SpinWheel from '../components/SpinWheel';
 import GuessTheIP from '../components/GuessTheIP';
 import Snakeandladder from '../components/Snakeandladder';
+import ArcheryGame from '../components/ArcheryGame';
 import { useGame } from '../hooks/useGame';
 
 const ModuleDetail = () => {
@@ -141,6 +142,7 @@ const ModuleDetail = () => {
                                                             {game.type === 'spin' && <RotateCw className="w-6 h-6" />}
                                                             {game.type === 'guess' && <HelpCircle className="w-6 h-6" />}
                                                             {game.type === 'snake' && <Trophy className="w-6 h-6" />}
+                                                            {game.type === 'archery' && <Target className="w-6 h-6" />}
                                                         </>
                                                     )}
                                                 </div>
@@ -214,6 +216,9 @@ const ModuleDetail = () => {
                             )}
                             {activeGame.type === 'snake' && (
                                 <Snakeandladder gameData={activeGame.data} moduleId={module.id} levelIndex={activeGameIndex} difficulty={difficulty} />
+                            )}
+                            {activeGame.type === 'archery' && (
+                                <ArcheryGame gameData={activeGame.data} moduleId={module.id} levelIndex={activeGameIndex} difficulty={difficulty} />
                             )}
                         </div>
                     )}
