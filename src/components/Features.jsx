@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Cpu, Globe, Lock, Search } from 'lucide-react';
+import ScrollReveal from './ScrollReveal';
 
 const params = [
     {
@@ -33,33 +34,32 @@ const Features = () => {
     return (
         <section className="py-24 relative">
             <div className="container mx-auto px-4">
-                <div className="text-center mb-16">
+                <ScrollReveal className="text-center mb-16">
                     <h2 className="text-3xl md:text-5xl font-heading font-bold mb-4">
                         Explore the Realm of <span className="text-gradient">IP Rights</span>
                     </h2>
-                    <p className="text-quest-muted max-w-2xl mx-auto">
+                    <p className="text-quest-muted max-w-2xl mx-auto text-lg">
                         Our gamified modules break down complex legal concepts into bite-sized, interactive adventures.
                     </p>
-                </div>
+                </ScrollReveal>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                     {params.map((feature, index) => (
-                        <motion.div
+                        <ScrollReveal
                             key={index}
-                            initial={{ opacity: 0, y: 20 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            viewport={{ once: true }}
-                            transition={{ delay: index * 0.1 }}
-                            className="glass-panel p-8 rounded-2xl hover:bg-white/5 transition-all group"
+                            variant="fade-up"
+                            delay={index * 0.1}
                         >
-                            <div className={`p-4 rounded-xl bg-white/5 w-fit mb-6 group-hover:scale-110 transition-transform duration-300`}>
-                                <feature.icon className={`w-8 h-8 ${feature.color}`} />
+                            <div className="glass-panel p-8 rounded-2xl hover:bg-white/5 transition-all group h-full">
+                                <div className={`p-4 rounded-xl bg-white/5 w-fit mb-6 group-hover:scale-110 transition-transform duration-300`}>
+                                    <feature.icon className={`w-8 h-8 ${feature.color}`} />
+                                </div>
+                                <h3 className="text-xl font-bold mb-3">{feature.title}</h3>
+                                <p className="text-quest-muted text-sm leading-relaxed">
+                                    {feature.desc}
+                                </p>
                             </div>
-                            <h3 className="text-xl font-bold mb-3">{feature.title}</h3>
-                            <p className="text-quest-muted text-sm leading-relaxed">
-                                {feature.desc}
-                            </p>
-                        </motion.div>
+                        </ScrollReveal>
                     ))}
                 </div>
             </div>

@@ -1,19 +1,44 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Trophy, Medal, Crown } from 'lucide-react';
+import { Trophy, Medal, Crown, Loader2 } from 'lucide-react';
 import { useGame } from '../hooks/useGame';
+import api from '../utils/api';
 
 const Leaderboard = () => {
-    const { xp, level } = useGame();
+    const { xp, level, user } = useGame();
+    const [players, setPlayers] = useState([]);
+    const [userRank, setUserRank] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
-    // Mock data for other players
-    const players = [
-        { rank: 1, name: "IPMaster99", xp: 12500, level: 12 },
-        { rank: 2, name: "PatentPro", xp: 11200, level: 11 },
-        { rank: 3, name: "CopyRight", xp: 9800, level: 9 },
-        { rank: 4, name: "IdeaGuard", xp: 8500, level: 8 },
-        { rank: 5, name: "SecretKeeper", xp: 7200, level: 7 },
-    ];
+    useEffect(() => {
+        const fetchLeaderboard = async () => {
+            try {
+                setLoading(true);
+                const data = await api.getLeaderboard();
+                setPlayers(data);
+
+                // Fetch current user's rank if logged in
+                if (user?.token) {
+                    try {
+                        const rankData = await api.getUserRank(user.token);
+                        setUserRank(rankData);
+                    } catch (rankErr) {
+                        console.error("Failed to fetch user rank:", rankErr);
+                    }
+                }
+
+                setError(null);
+            } catch (err) {
+                console.error("Failed to fetch leaderboard:", err);
+                setError("Could not load ranking data.");
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchLeaderboard();
+    }, []);
 
     return (
         <div className="container mx-auto px-4 pt-32 pb-12">
@@ -30,11 +55,13 @@ const Leaderboard = () => {
                     <div className="absolute top-0 left-0 w-full h-full bg-quest-primary/5 z-0" />
                     <div className="relative z-10 flex items-center gap-4">
                         <div className="w-16 h-16 rounded-full bg-quest-primary flex items-center justify-center text-xl font-bold">
-                            You
+                            {user?.name?.charAt(0) || "Y"}
                         </div>
                         <div>
-                            <h3 className="text-xl font-bold">Your Rank</h3>
-                            <p className="text-quest-muted">Level {level} Protector</p>
+                            <h3 className="text-xl font-bold">{user?.name || "Your Rank"}</h3>
+                            <p className="text-quest-muted">
+                                {userRank ? `Global Rank: #${userRank.rank}` : `Level ${level} Protector`}
+                            </p>
                         </div>
                     </div>
                     <div className="relative z-10 text-right">
@@ -52,25 +79,45 @@ const Leaderboard = () => {
                     </div>
 
                     <div className="divide-y divide-white/5">
-                        {players.map((player, index) => (
-                            <div key={index} className="flex items-center justify-between p-6 hover:bg-white/5 transition-colors">
-                                <div className="flex items-center gap-6">
-                                    <div className={`w-8 h-8 flex items-center justify-center font-bold text-lg ${index === 0 ? 'text-yellow-400' :
-                                        index === 1 ? 'text-gray-300' :
-                                            index === 2 ? 'text-amber-600' : 'text-quest-muted'
-                                        }`}>
-                                        {index + 1}
-                                    </div>
-                                    <div>
-                                        <div className="font-bold">{player.name}</div>
-                                        <div className="text-xs text-quest-muted">Level {player.level}</div>
-                                    </div>
-                                </div>
-                                <div className="font-heading font-bold text-quest-primary">
-                                    {player.xp.toLocaleString()} XP
-                                </div>
+                        {loading ? (
+                            <div className="p-12 flex flex-col items-center justify-center gap-4 text-quest-muted">
+                                <Loader2 className="w-8 h-8 animate-spin text-quest-primary" />
+                                <p>Loading rankings...</p>
                             </div>
-                        ))}
+                        ) : error ? (
+                            <div className="p-12 text-center text-red-400">
+                                {error}
+                            </div>
+                        ) : players.length === 0 ? (
+                            <div className="p-12 text-center text-quest-muted">
+                                No guardians found yet. Be the first!
+                            </div>
+                        ) : (
+                            players.map((player, index) => (
+                                <div key={player._id || index} className={`flex items-center justify-between p-6 transition-colors hover:bg-white/5 ${user?.email === player.email ? 'bg-quest-primary/10' : ''}`}>
+                                    <div className="flex items-center gap-6">
+                                        <div className={`w-8 h-8 flex items-center justify-center font-bold text-lg ${index === 0 ? 'text-yellow-400' :
+                                            index === 1 ? 'text-gray-300' :
+                                                index === 2 ? 'text-amber-600' : 'text-quest-muted'
+                                            }`}>
+                                            {index + 1}
+                                        </div>
+                                        <div>
+                                            <div className="font-bold flex items-center gap-2">
+                                                {player.name}
+                                                {user?.name === player.name && (
+                                                    <span className="text-[10px] bg-quest-primary/20 text-quest-primary px-2 py-0.5 rounded-full">YOU</span>
+                                                )}
+                                            </div>
+                                            <div className="text-xs text-quest-muted">Level {player.xp}</div>
+                                        </div>
+                                    </div>
+                                    <div className="font-heading font-bold text-quest-primary">
+                                        {player.xp.toLocaleString()} XP
+                                    </div>
+                                </div>
+                            ))
+                        )}
                     </div>
                 </div>
             </div>

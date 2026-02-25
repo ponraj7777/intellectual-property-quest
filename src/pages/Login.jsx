@@ -11,16 +11,18 @@ const Login = () => {
     const { login } = useGame();
     const navigate = useNavigate();
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         setIsLoading(true);
 
-        // Mock login delay
-        setTimeout(() => {
-            login({ name: email.split('@')[0], email });
-            setIsLoading(false);
+        try {
+            await login(email, password);
             navigate('/modules');
-        }, 1200);
+        } catch (error) {
+            // Error toast is already handled in useGame
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     return (
@@ -45,7 +47,7 @@ const Login = () => {
                         >
                             <LogIn className="w-8 h-8 text-quest-primary" />
                         </motion.div>
-                        <h1 className="text-3xl font-heading font-bold text-white mb-2">Welcome Back</h1>
+                        <h1 className="text-3xl font-heading font-bold text-quest-muted mb-2">Welcome Back</h1>
                         <p className="text-quest-muted">Continue your intellectual property quest</p>
                     </div>
 

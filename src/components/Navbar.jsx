@@ -3,6 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { Menu, X, Zap, User } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useGame } from '../hooks/useGame';
+import ThemeToggle from './ThemeToggle';
 
 const Navbar = () => {
     const [isOpen, setIsOpen] = useState(false);
@@ -32,14 +33,14 @@ const Navbar = () => {
     ];
 
     return (
-        <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? 'bg-quest-dark/80 backdrop-blur-lg border-b border-white/10 py-4' : 'bg-transparent py-6'
+        <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? 'bg-quest-card/80 backdrop-blur-lg border-b border-quest-text/10 py-4' : 'bg-transparent py-6'
             }`}>
             <div className="container mx-auto px-4 flex justify-between items-center">
                 <Link to="/" className="flex items-center space-x-2 group">
                     <div className="p-2 bg-quest-primary/20 rounded-lg group-hover:bg-quest-primary/30 transition-colors">
                         <Zap className="text-quest-primary w-6 h-6" />
                     </div>
-                    <span className="text-xl font-heading font-bold text-white tracking-wide group-hover:text-quest-primary transition-colors">
+                    <span className="text-xl font-heading font-bold text-quest-text tracking-wide group-hover:text-quest-primary transition-colors">
                         IP Quest
                     </span>
                 </Link>
@@ -76,13 +77,16 @@ const Navbar = () => {
                         </Link>
                     ))}
 
+                    <div className="h-6 w-[1px] bg-quest-text/10 mx-2" />
+                    <ThemeToggle />
+
                     {user ? (
-                        <div className="flex items-center gap-4">
-                            <div className="flex items-center gap-2 px-3 py-1.5 bg-white/5 border border-white/10 rounded-xl">
+                        <div className="flex items-center gap-4 ml-2">
+                            <div className="flex items-center gap-2 px-3 py-1.5 bg-quest-text/5 border border-quest-text/10 rounded-xl">
                                 <div className="w-6 h-6 bg-quest-primary/20 rounded-full flex items-center justify-center text-[10px] font-bold text-quest-primary">
                                     {user.name[0].toUpperCase()}
                                 </div>
-                                <span className="text-sm font-medium text-white">{user.name}</span>
+                                <span className="text-sm font-medium text-quest-text">{user.name}</span>
                             </div>
                             <button
                                 onClick={logout}
@@ -92,11 +96,11 @@ const Navbar = () => {
                             </button>
                         </div>
                     ) : (
-                        <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-4 ml-2">
                             <Link to="/login" className="btn-primary py-2 px-4 shadow-none text-sm text-center">
                                 Login
                             </Link>
-                            <Link to="/signup" className="border border-white/10 hover:border-quest-primary/50 py-2 px-4 rounded-xl text-sm transition-all hover:bg-white/5">
+                            <Link to="/signup" className="btn-secondary py-2 px-4 text-sm">
                                 Sign Up
                             </Link>
                         </div>
@@ -104,12 +108,15 @@ const Navbar = () => {
                 </div>
 
                 {/* Mobile Menu Button */}
-                <button
-                    className="md:hidden text-white p-2"
-                    onClick={() => setIsOpen(!isOpen)}
-                >
-                    {isOpen ? <X /> : <Menu />}
-                </button>
+                <div className="flex items-center gap-4 md:hidden">
+                    <ThemeToggle />
+                    <button
+                        className="text-quest-text p-2"
+                        onClick={() => setIsOpen(!isOpen)}
+                    >
+                        {isOpen ? <X /> : <Menu />}
+                    </button>
+                </div>
             </div>
 
             {/* Mobile Nav */}
@@ -140,7 +147,7 @@ const Navbar = () => {
                                             {user.name[0].toUpperCase()}
                                         </div>
                                         <div>
-                                            <div className="text-white font-medium">{user.name}</div>
+                                            <div className="text-quest-text font-medium">{user.name}</div>
                                             <div className="text-xs text-quest-muted">{user.email}</div>
                                         </div>
                                     </div>
@@ -159,7 +166,7 @@ const Navbar = () => {
                                     <Link to="/login" className="btn-primary w-full mt-4 text-center" onClick={() => setIsOpen(false)}>
                                         Login
                                     </Link>
-                                    <Link to="/signup" className="w-full mt-2 border border-white/10 py-3 rounded-xl text-center hover:bg-white/5" onClick={() => setIsOpen(false)}>
+                                    <Link to="/signup" className="w-full mt-2 border border-quest-text/10 py-3 rounded-xl text-center hover:bg-quest-text/5" onClick={() => setIsOpen(false)}>
                                         Sign Up
                                     </Link>
                                 </>

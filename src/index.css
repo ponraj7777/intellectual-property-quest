@@ -6,11 +6,29 @@
 
 @layer base {
   :root {
+    color-scheme: light;
+    --color-bg: 255 251 242;
+    --color-card: 249 244 229;
+    --color-primary: 237 128 42;
+    --color-secondary: 146 159 193;
+    --color-accent: 237 196 90;
+    --color-text: 93 64 55;
+    --color-muted: 141 110 99;
+  }
+
+  .dark {
     color-scheme: dark;
+    --color-bg: 10 10 10;
+    --color-card: 21 21 21;
+    --color-primary: 242 153 74;
+    --color-secondary: 86 204 242;
+    --color-accent: 242 201 76;
+    --color-text: 242 242 242;
+    --color-muted: 189 189 189;
   }
 
   body {
-    @apply bg-quest-dark text-quest-text antialiased font-sans overflow-x-hidden selection:bg-quest-primary selection:text-white;
+    @apply bg-quest-dark text-quest-text antialiased font-sans overflow-x-hidden transition-colors duration-300 selection:bg-quest-text selection:text-quest-card;
   }
 
   h1,
@@ -38,6 +56,14 @@
   }
 
   .btn-primary {
-    @apply px-6 py-3 bg-quest-primary text-white font-medium rounded-lg hover:bg-quest-primary/90 transition-all shadow-lg hover:shadow-quest-primary/25 active:scale-95;
+    @apply px-6 py-3 bg-quest-primary text-white font-medium rounded-xl transition-all duration-300 shadow-lg hover:shadow-quest-primary/40 hover:-translate-y-1 hover:scale-105 active:scale-95 active:shadow-sm;
+  }
+
+  .btn-secondary {
+    @apply px-6 py-3 bg-quest-card border border-quest-text/10 text-quest-text font-medium rounded-xl transition-all duration-300 hover:bg-quest-card hover:border-quest-primary/30 hover:shadow-lg hover:-translate-y-1 hover:scale-105 active:scale-95;
+  }
+
+  .btn-ghost {
+    @apply px-4 py-2 text-quest-muted hover:text-quest-primary transition-all duration-300 hover:bg-quest-primary/10 rounded-lg active:scale-95;
   }
 }

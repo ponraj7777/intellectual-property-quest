@@ -3,7 +3,7 @@ import React from 'react';
 const MeshBackground = () => {
     return (
         <div className="fixed inset-0 z-[-1] overflow-hidden pointer-events-none bg-quest-dark">
-            <div className="absolute inset-0 opacity-40">
+            <div className="absolute inset-0 opacity-40 dark:opacity-20 transition-opacity duration-500">
                 {/* Aurora Blobs - Earthy Tones */}
                 <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-quest-primary blur-[120px] rounded-full animate-aurora-slow opacity-30"></div>
                 <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-quest-accent blur-[120px] rounded-full animate-aurora-medium opacity-20"></div>

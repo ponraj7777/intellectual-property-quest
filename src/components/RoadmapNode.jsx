@@ -15,17 +15,17 @@ const RoadmapNode = ({ level, gameTitle, status, onSelect, colorClass }) => {
                     className={`
                         w-16 h-16 rounded-full flex items-center justify-center border-4 transition-all duration-300 relative
                         ${isCompleted
-                            ? `bg-white/10 ${colorClass.replace('text-', 'border-')} border-solid shadow-xl shadow-${colorClass.split('-')[1]}-500/40 opacity-100`
+                            ? `bg-quest-card border-current ${colorClass} shadow-xl opacity-100`
                             : isLocked
-                                ? 'bg-white/10 border-white/40 opacity-90 cursor-not-allowed'
-                                : `bg-white/5 border-white/60 hover:border-${colorClass.split('-')[1]}-400 opacity-100`
+                                ? 'bg-quest-card/10 border-quest-text/10 opacity-60 cursor-not-allowed'
+                                : `bg-quest-card/50 border-quest-text/20 hover:border-current hover:${colorClass} opacity-100`
                         }
                     `}
                 >
                     {isLocked ? (
-                        <Lock className="w-6 h-6 text-white/40" />
+                        <Lock className="w-6 h-6 text-quest-text/40" />
                     ) : (
-                        <span className="text-sm font-black uppercase tracking-tighter text-white">{level.substring(0, 1)}</span>
+                        <span className="text-sm font-black uppercase tracking-tighter text-quest-text">{level.substring(0, 1)}</span>
                     )}
 
                     {/* Completion Ring */}
@@ -35,7 +35,7 @@ const RoadmapNode = ({ level, gameTitle, status, onSelect, colorClass }) => {
                             fill="none"
                             stroke="currentColor"
                             strokeWidth="4"
-                            className="text-white/5"
+                            className="text-quest-text/5"
                         />
                         <motion.circle
                             cx="28" cy="28" r="28"

@@ -33,8 +33,8 @@ const RoadmapPath = ({ isCompleted, isFromLeft, progress = 0 }) => {
             >
                 <defs>
                     <linearGradient id={`pathGradient-${isFromLeft ? 'L' : 'R'}`} x1="0%" y1="0%" x2="0%" y2="100%">
-                        <stop offset="0%" stopColor="#6366f1" />
-                        <stop offset="100%" stopColor="#10b981" />
+                        <stop offset="0%" stopColor="#ED802A" />
+                        <stop offset="100%" stopColor="#65BCB5" />
                     </linearGradient>
                     <filter id="glow-enhanced" x="-20%" y="-20%" width="140%" height="140%">
                         <feGaussianBlur stdDeviation="4" result="blur" />
@@ -46,9 +46,10 @@ const RoadmapPath = ({ isCompleted, isFromLeft, progress = 0 }) => {
                 <path
                     d={path}
                     fill="none"
-                    stroke="rgba(255,255,255,0.2)"
+                    stroke="currentColor"
                     strokeWidth="6"
                     strokeLinecap="round"
+                    className="text-quest-text/10"
                 />
 
                 {/* completion path (Active/Glow) */}

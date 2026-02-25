@@ -4,6 +4,7 @@ import { Toaster } from 'sonner';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import MeshBackground from './components/MeshBackground';
+import ChatBot from './components/ChatBot';
 
 import Home from './pages/Home';
 import Modules from './pages/Modules';
@@ -14,32 +15,36 @@ import Signup from './pages/Signup';
 import Roadmap from './pages/Roadmap';
 
 import { GameProvider } from './hooks/useGame';
+import { ThemeProvider } from './context/ThemeContext';
 
 function App() {
   return (
-    <GameProvider>
-      <Router>
-        <div className="min-h-screen text-white font-sans selection:bg-quest-primary selection:text-white flex flex-col relative">
-          <MeshBackground />
-          <Toaster theme="dark" position="top-center" />
-          <Navbar />
+    <ThemeProvider>
+      <GameProvider>
+        <Router>
+          <div className="min-h-screen text-quest-text font-sans flex flex-col relative transition-colors duration-300">
+            <MeshBackground />
+            <Toaster theme="dark" position="top-center" />
+            <Navbar />
 
-          <main className="flex-grow">
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/roadmap" element={<Roadmap />} />
-              <Route path="/modules" element={<Modules />} />
-              <Route path="/modules/:moduleId" element={<ModuleDetail />} />
-              <Route path="/leaderboard" element={<Leaderboard />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/signup" element={<Signup />} />
-            </Routes>
-          </main>
+            <main className="flex-grow">
+              <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/roadmap" element={<Roadmap />} />
+                <Route path="/modules" element={<Modules />} />
+                <Route path="/modules/:moduleId" element={<ModuleDetail />} />
+                <Route path="/leaderboard" element={<Leaderboard />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/signup" element={<Signup />} />
+              </Routes>
+            </main>
 
-          <Footer />
-        </div>
-      </Router>
-    </GameProvider>
+            <Footer />
+            <ChatBot />
+          </div>
+        </Router>
+      </GameProvider>
+    </ThemeProvider>
   );
 }
 

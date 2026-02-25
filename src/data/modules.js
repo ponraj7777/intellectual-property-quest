@@ -6,7 +6,7 @@ export const modulesData = [
         title: 'Patents',
         description: 'Protect your inventions. Learn about utility, design, and plant patents, and the application process.',
         icon: Lock,
-        color: 'text-blue-400',
+        color: 'text-quest-primary',
         path: '/modules/patents',
         games: [
             {
@@ -47,6 +47,23 @@ export const modulesData = [
                 }
             },
             {
+                type: 'reverse-hangman',
+                title: 'Save the Inventor',
+                description: 'Answer correctly to lower the inventor to safety before the fire rises!',
+                data: {
+                    questions: [
+                        { text: "A provisional patent lasts for...", options: ["12 months", "3 years", "6 months", "Forever"], correctAnswer: 0 },
+                        { text: "Who issues patents in the USA?", options: ["USPTO", "NASA", "FBI", "Apple"], correctAnswer: 0 },
+                        { text: "Which is NOT patentable?", options: ["Abstract Idea", "New Machine", "Chemical Formula", "Plant Strain"], correctAnswer: 0 },
+                        { text: "Patent protection is...", options: ["Territorial", "Worldwide", "Universal", "Solar System-wide"], correctAnswer: 0 },
+                        { text: "Design patents protect...", options: ["Ornamental look", "Functional use", "Idea", "Brand name"], correctAnswer: 0 },
+                        { text: "Can you patent a law of nature?", options: ["No", "Yes", "Only if written", "Maybe"], correctAnswer: 0 },
+                        { text: "Utility patents usually last...", options: ["20 years", "14 years", "70 years", "50 years"], correctAnswer: 0 },
+                        { text: "To be patentable, an invention must be...", options: ["Novel", "Expensive", "Complex", "Artistic"], correctAnswer: 0 }
+                    ]
+                }
+            },
+            {
                 type: 'quiz',
                 title: 'Inventor\'s Exam',
                 description: 'Test your knowledge on patent laws and durations.',
@@ -77,7 +94,7 @@ export const modulesData = [
         title: 'Copyrights',
         description: 'Safeguard your creative works. Understand rights for literary, artistic, educational, and musical content.',
         icon: Cpu,
-        color: 'text-rose-400',
+        color: 'text-quest-accent',
         path: '/modules/copyrights',
         games: [
             {
@@ -216,7 +233,7 @@ export const modulesData = [
         title: 'Trademarks',
         description: 'Secure your brand identity. distinctive signs, names, and symbols that distinguish your goods.',
         icon: Globe,
-        color: 'text-purple-400',
+        color: 'text-quest-secondary',
         path: '/modules/trademarks',
         games: [
             {
@@ -267,7 +284,7 @@ export const modulesData = [
         title: 'Trade Secrets',
         description: 'Keep your competitive edge. Protect confidential business information and know-how.',
         icon: Search,
-        color: 'text-emerald-400',
+        color: 'text-quest-text',
         path: '/modules/trade-secrets',
         games: [
             {

@@ -93,9 +93,9 @@ const Quiz = ({ questions, moduleId, levelIndex, difficulty = 'easy', onComplete
                         disabled={isAnswered}
                         className={`w-full p-4 rounded-xl text-left transition-all border ${isAnswered
                             ? index === question.correctAnswer
-                                ? 'bg-green-500/20 border-green-500 text-green-200'
+                                ? 'bg-green-500/20 border-green-500 text-green-800'
                                 : index === selectedAnswer
-                                    ? 'bg-red-500/20 border-red-500 text-red-200'
+                                    ? 'bg-red-500/20 border-red-500 text-red-800'
                                     : 'bg-white/5 border-transparent opacity-50'
                             : 'bg-white/5 border-white/10 hover:bg-white/10 hover:border-quest-primary/50'
                             }`}

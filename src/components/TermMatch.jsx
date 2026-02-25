@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Trophy, Timer, X, CheckCircle2, AlertCircle, GripVertical } from 'lucide-react';
 import {
@@ -274,18 +275,21 @@ const TermMatch = ({ gameData, moduleId, levelIndex, difficulty = 'easy', onComp
                     </div>
                 </div>
 
-                <DragOverlay dropAnimation={null} zIndex={1000} style={{ pointerEvents: 'none' }}>
-                    {activeId ? (
-                        <div className="p-4 rounded-xl border-2 border-quest-primary bg-quest-primary/60 backdrop-blur-lg shadow-2xl scale-110">
-                            <div className="flex items-center gap-3">
-                                <GripVertical className="w-4 h-4 text-quest-primary" />
-                                <span className="font-bold text-white">
-                                    {terms.find(t => t.id === activeId)?.content}
-                                </span>
+                {createPortal(
+                    <DragOverlay dropAnimation={null} zIndex={1000} style={{ pointerEvents: 'none' }}>
+                        {activeId ? (
+                            <div className="p-4 rounded-xl border-2 border-quest-primary bg-quest-primary/60 backdrop-blur-lg shadow-2xl scale-110">
+                                <div className="flex items-center gap-3">
+                                    <GripVertical className="w-4 h-4 text-quest-primary" />
+                                    <span className="font-bold text-white">
+                                        {terms.find(t => t.id === activeId)?.content}
+                                    </span>
+                                </div>
                             </div>
-                        </div>
-                    ) : null}
-                </DragOverlay>
+                        ) : null}
+                    </DragOverlay>,
+                    document.body
+                )}
             </DndContext>
 
             <style>{`

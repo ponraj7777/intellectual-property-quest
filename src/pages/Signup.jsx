@@ -12,16 +12,18 @@ const Signup = () => {
     const { signup } = useGame();
     const navigate = useNavigate();
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         setIsLoading(true);
 
-        // Mock signup delay
-        setTimeout(() => {
-            signup({ name, email });
-            setIsLoading(false);
+        try {
+            await signup(name, email, password);
             navigate('/modules');
-        }, 1200);
+        } catch (error) {
+            // Error toast is already handled in useGame
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     return (
@@ -46,7 +48,7 @@ const Signup = () => {
                         >
                             <UserPlus className="w-8 h-8 text-quest-primary" />
                         </motion.div>
-                        <h1 className="text-3xl font-heading font-bold text-white mb-2">New Quest</h1>
+                        <h1 className="text-3xl font-heading font-bold text-quest-muted mb-2">New Quest</h1>
                         <p className="text-quest-muted">Start your journey as an IP Detective</p>
                     </div>
 

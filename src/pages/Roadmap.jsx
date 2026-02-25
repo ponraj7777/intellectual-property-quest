@@ -1,15 +1,16 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, ChevronRight, Info, Award, Circle, RotateCcw } from 'lucide-react';
+import { ArrowLeft, ChevronRight, Info, Award, Circle, RotateCcw, Lock } from 'lucide-react';
 import { modulesData } from '../data/modules';
 import { useGame } from '../hooks/useGame';
 import RoadmapNode from '../components/RoadmapNode';
 import RoadmapPath from '../components/RoadmapPath';
+import { toast } from 'sonner';
 
 const Roadmap = () => {
     const navigate = useNavigate();
-    const { completedLevels, isLevelUnlocked, resetProgress } = useGame();
+    const { user, completedLevels, isLevelUnlocked, resetProgress } = useGame();
     const [activeModuleIndex, setActiveModuleIndex] = useState(0);
 
     const activeModule = modulesData[activeModuleIndex];
@@ -33,7 +34,7 @@ const Roadmap = () => {
         <div className="container mx-auto px-4 pt-32 pb-12 min-h-screen">
             <button
                 onClick={() => navigate('/modules')}
-                className="inline-flex items-center text-quest-muted hover:text-white mb-8 transition-colors group"
+                className="inline-flex items-center text-quest-muted hover:text-quest-text mb-8 transition-colors group"
             >
                 <ArrowLeft className="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" />
                 Back to Modules
@@ -48,10 +49,10 @@ const Roadmap = () => {
                             key={module.id}
                             onClick={() => setActiveModuleIndex(index)}
                             className={`
-                                w-full p-4 rounded-xl text-left transition-all border-2 flex items-center justify-between group
+                                w-full p-4 rounded-xl text-left transition-all duration-300 border-2 flex items-center justify-between group hover:scale-[1.02] active:scale-[0.98]
                                 ${activeModuleIndex === index
-                                    ? `bg-white/10 border-quest-primary shadow-lg shadow-quest-primary/10`
-                                    : 'bg-white/5 border-transparent hover:bg-white/10'}
+                                    ? `bg-quest-card border-quest-primary shadow-lg shadow-quest-primary/10`
+                                    : 'bg-quest-card/50 border-transparent hover:bg-quest-card'}
                             `}
                         >
                             <div className="flex items-center gap-3">
@@ -61,7 +62,7 @@ const Roadmap = () => {
                                 </span>
                             </div>
                             <div className="flex items-center gap-2">
-                                <span className="text-[10px] font-mono text-quest-muted bg-white/5 px-1.5 py-0.5 rounded">
+                                <span className="text-[10px] font-mono text-quest-muted bg-quest-text/5 px-1.5 py-0.5 rounded">
                                     {calculateProgress(module)}%
                                 </span>
                                 <ChevronRight className={`w-4 h-4 transition-transform ${activeModuleIndex === index ? 'opacity-100 translate-x-1' : 'opacity-0'}`} />
@@ -69,7 +70,7 @@ const Roadmap = () => {
                         </button>
                     ))}
 
-                    <div className="pt-8 mt-8 border-t border-white/10">
+                    <div className="pt-8 mt-8 border-t border-quest-text/10">
                         <button
                             onClick={() => {
                                 if (window.confirm("Are you sure you want to reset your entire journey? This cannot be undone.")) {
@@ -97,9 +98,28 @@ const Roadmap = () => {
 
                         <div className="mb-12">
                             <h1 className="text-4xl md:text-5xl font-black mb-4 font-heading">{activeModule.title} Journey</h1>
-                            <p className="text-quest-muted max-w-xl text-lg leading-relaxed">
-                                {activeModule.description}
-                            </p>
+
+                            {!user ? (
+                                <div className="p-6 bg-quest-primary/10 border border-quest-primary/30 rounded-2xl mb-8 flex flex-col md:flex-row items-center md:justify-between gap-6 text-center md:text-left">
+                                    <div className="flex flex-col md:flex-row items-center gap-4">
+                                        <div className="p-3 bg-quest-primary/20 rounded-xl text-quest-primary flex-shrink-0">
+                                            <Lock className="w-6 h-6" />
+                                        </div>
+                                        <div>
+                                            <h4 className="font-bold text-lg">Quest Access Locked</h4>
+                                            <p className="text-sm text-quest-muted">Login to track your progress and unlock new challenges.</p>
+                                        </div>
+                                    </div>
+                                    <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+                                        <Link to="/login" className="px-6 py-2.5 bg-quest-primary text-white rounded-lg font-bold hover:bg-quest-primary/80 transition-all text-center">Login</Link>
+                                        <Link to="/signup" className="px-6 py-2.5 bg-white/5 border border-white/10 rounded-lg hover:bg-white/10 transition-all text-center">Join Quest</Link>
+                                    </div>
+                                </div>
+                            ) : (
+                                <p className="text-quest-muted max-w-xl text-lg leading-relaxed">
+                                    {activeModule.description}
+                                </p>
+                            )}
 
                             {/* Overall Progress Bar */}
                             <div className="mt-8 max-w-md">
@@ -107,7 +127,7 @@ const Roadmap = () => {
                                     <span className="text-quest-muted">Path Progress</span>
                                     <span>{calculateProgress(activeModule)}%</span>
                                 </div>
-                                <div className="h-3 bg-white/5 rounded-full overflow-hidden p-0.5 border border-white/10">
+                                <div className="h-3 bg-quest-card rounded-full overflow-hidden p-0.5 border border-quest-text/10">
                                     <motion.div
                                         initial={{ width: 0 }}
                                         animate={{ width: `${calculateProgress(activeModule)}%` }}
@@ -144,7 +164,16 @@ const Roadmap = () => {
                                                         progress
                                                     }}
                                                     colorClass={activeModule.color}
-                                                    onSelect={() => navigate(`/modules/${activeModule.id}`, { state: { difficulty } })}
+                                                    onSelect={() => {
+                                                        if (!user) {
+                                                            toast.error("Protector Check Failed", {
+                                                                description: "Please login to embark on this journey node."
+                                                            });
+                                                            navigate('/login');
+                                                            return;
+                                                        }
+                                                        navigate(`/modules/${activeModule.id}`, { state: { difficulty } });
+                                                    }}
                                                 />
                                             </div>
 
@@ -154,10 +183,10 @@ const Roadmap = () => {
                                                 ${isEven ? 'text-left' : 'text-right'}
                                                 ${isLocked ? 'opacity-40' : 'opacity-100'}
                                             `}>
-                                                <h3 className={`font-bold text-xl mb-2 ${isLocked ? 'text-white/20' : 'text-white'}`}>
+                                                <h3 className={`font-bold text-xl mb-2 ${isLocked ? 'text-quest-text/20' : 'text-quest-text'}`}>
                                                     {difficulty.toUpperCase()} MODE
                                                 </h3>
-                                                <p className={`text-base leading-relaxed ${isLocked ? 'text-white/10' : 'text-quest-muted'}`}>
+                                                <p className={`text-base leading-relaxed ${isLocked ? 'text-quest-text/10' : 'text-quest-muted'}`}>
                                                     {isCompleted
                                                         ? `Mastered all ${difficulty} challenges!`
                                                         : isLocked
@@ -184,9 +213,9 @@ const Roadmap = () => {
 
                         {/* Boss Level Callout */}
                         <div className="mt-12 text-center">
-                            <div className="inline-flex items-center gap-2 px-6 py-3 bg-white/5 border border-white/10 rounded-full text-quest-muted text-sm font-medium">
+                            <div className="inline-flex items-center gap-2 px-6 py-3 bg-quest-card border border-quest-text/10 rounded-full text-quest-muted text-sm font-medium">
                                 <Award className="w-4 h-4" />
-                                <span>Complete all difficulties to earn the <strong className="text-white">{activeModule.title} Mastery Badge</strong></span>
+                                <span>Complete all difficulties to earn the <strong className="text-quest-text">{activeModule.title} Mastery Badge</strong></span>
                             </div>
                         </div>
                     </motion.div>

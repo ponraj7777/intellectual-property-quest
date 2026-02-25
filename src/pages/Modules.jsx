@@ -1,10 +1,26 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Link } from 'react-router-dom';
+import { ArrowRight, Lock } from 'lucide-react';
 import { modulesData } from '../data/modules';
-import { ArrowRight } from 'lucide-react';
+import { useGame } from '../hooks/useGame';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 
 const Modules = () => {
+    const { user } = useGame();
+    const navigate = useNavigate();
+
+    const handleEnterModule = (path) => {
+        if (!user) {
+            toast.error("Authentication Required", {
+                description: "Please login to access training modules and games."
+            });
+            navigate('/login');
+            return;
+        }
+        navigate(path);
+    };
+
     return (
         <div className="container mx-auto px-4 pt-32 pb-12">
             <div className="text-center mb-16">
@@ -23,12 +39,12 @@ const Modules = () => {
                         initial={{ opacity: 0, scale: 0.95 }}
                         animate={{ opacity: 1, scale: 1 }}
                         transition={{ delay: index * 0.1 }}
-                        className="glass-panel p-8 rounded-2xl hover:bg-white/5 transition-all group relative overflow-hidden"
+                        className="glass-panel p-8 rounded-2xl hover:bg-quest-card/50 transition-all duration-500 hover:scale-[1.02] group relative overflow-hidden"
                     >
-                        <div className={`absolute top-0 right-0 p-32 bg-gradient-to-br from-white/5 to-transparent rounded-full -translate-y-1/2 translate-x-1/2 blur-2xl group-hover:bg-white/10 transition-colors`} />
+                        <div className={`absolute top-0 right-0 p-32 bg-gradient-to-br from-quest-text/5 to-transparent rounded-full -translate-y-1/2 translate-x-1/2 blur-2xl group-hover:bg-quest-text/10 transition-colors`} />
 
                         <div className="relative z-10">
-                            <div className={`p-4 rounded-xl bg-white/5 w-fit mb-6`}>
+                            <div className={`p-4 rounded-xl bg-quest-text/5 w-fit mb-6`}>
                                 <module.icon className={`w-10 h-10 ${module.color}`} />
                             </div>
 
@@ -37,12 +53,13 @@ const Modules = () => {
                                 {module.description}
                             </p>
 
-                            <Link
-                                to={module.path}
-                                className="inline-flex items-center gap-2 text-white font-medium hover:text-quest-primary transition-colors group-hover:translate-x-1 duration-300"
+                            <button
+                                onClick={() => handleEnterModule(module.path)}
+                                className="inline-flex items-center gap-2 text-quest-text font-medium hover:text-quest-primary transition-colors group-hover:translate-x-1 duration-300"
                             >
-                                Enter Module <ArrowRight className="w-4 h-4" />
-                            </Link>
+                                {user ? "Enter Module" : "Login to Play"}
+                                {user ? <ArrowRight className="w-4 h-4" /> : <Lock className="w-4 h-4" />}
+                            </button>
                         </div>
                     </motion.div>
                 ))}
