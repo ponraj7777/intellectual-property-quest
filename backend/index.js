@@ -37,7 +37,7 @@ app.use('/api/users', userRoutes);
 
 // Basic Route
 app.get('/', (req, res) => {
-    res.send('API is running...');
+    res.json({ message: 'API is running...' });
 });
 
 // Port
