@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate, Link } from 'react-router-dom';
-import { Mail, Lock, User, UserPlus, ArrowRight } from 'lucide-react';
+import { Mail, Lock, User, UserPlus, ArrowRight, Calendar } from 'lucide-react';
 import { useGame } from '../hooks/useGame';
 
 const Signup = () => {
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
+    const [dob, setDob] = useState('');
     const [password, setPassword] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const { signup } = useGame();
@@ -17,7 +18,7 @@ const Signup = () => {
         setIsLoading(true);
 
         try {
-            await signup(name, email, password);
+            await signup(name, email, password, dob);
             navigate('/modules');
         } catch (error) {
             // Error toast is already handled in useGame
@@ -64,7 +65,7 @@ const Signup = () => {
                                     value={name}
                                     onChange={(e) => setName(e.target.value)}
                                     placeholder="John Doe"
-                                    className="w-full bg-white/5 border border-white/10 rounded-xl py-3 pl-12 pr-4 text-white placeholder:text-white/20 focus:outline-none focus:ring-2 focus:ring-quest-primary/50 focus:border-quest-primary transition-all"
+                                    className="w-full bg-white/5 border border-white/10 rounded-xl py-3 pl-12 pr-4 text-quest-text placeholder:text-quest-muted/40 focus:outline-none focus:ring-2 focus:ring-quest-primary/50 focus:border-quest-primary transition-all"
                                     required
                                 />
                             </div>
@@ -81,7 +82,23 @@ const Signup = () => {
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
                                     placeholder="name@example.com"
-                                    className="w-full bg-white/5 border border-white/10 rounded-xl py-3 pl-12 pr-4 text-white placeholder:text-white/20 focus:outline-none focus:ring-2 focus:ring-quest-primary/50 focus:border-quest-primary transition-all"
+                                    className="w-full bg-white/5 border border-white/10 rounded-xl py-3 pl-12 pr-4 text-quest-text placeholder:text-quest-muted/40 focus:outline-none focus:ring-2 focus:ring-quest-primary/50 focus:border-quest-primary transition-all"
+                                    required
+                                />
+                            </div>
+                        </div>
+
+                        <div className="space-y-2">
+                            <label className="text-sm font-medium text-quest-muted ml-1">Date of Birth</label>
+                            <div className="relative group">
+                                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-quest-muted group-focus-within:text-quest-primary transition-colors">
+                                    <Calendar className="w-5 h-5" />
+                                </div>
+                                <input
+                                    type="date"
+                                    value={dob}
+                                    onChange={(e) => setDob(e.target.value)}
+                                    className="w-full bg-white/5 border border-white/10 rounded-xl py-3 pl-12 pr-4 text-quest-text placeholder:text-quest-muted/40 focus:outline-none focus:ring-2 focus:ring-quest-primary/50 focus:border-quest-primary transition-all"
                                     required
                                 />
                             </div>
@@ -98,7 +115,7 @@ const Signup = () => {
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
                                     placeholder="••••••••"
-                                    className="w-full bg-white/5 border border-white/10 rounded-xl py-3 pl-12 pr-4 text-white placeholder:text-white/20 focus:outline-none focus:ring-2 focus:ring-quest-primary/50 focus:border-quest-primary transition-all"
+                                    className="w-full bg-white/5 border border-white/10 rounded-xl py-3 pl-12 pr-4 text-quest-text placeholder:text-quest-muted/40 focus:outline-none focus:ring-2 focus:ring-quest-primary/50 focus:border-quest-primary transition-all"
                                     required
                                 />
                             </div>

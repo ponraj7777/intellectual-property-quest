@@ -16,12 +16,13 @@ const Roadmap = () => {
     const activeModule = modulesData[activeModuleIndex];
 
     const calculateProgress = (module) => {
-        const totalLevels = module.games.length * 3; // 3 difficulties per game
+        const totalLevels = 9; // 3 difficulties * 3 levels each
         let completed = 0;
 
-        module.games.forEach((_, gameIndex) => {
-            ['easy', 'medium', 'hard'].forEach(diff => {
-                if (completedLevels.includes(`${module.id}-${gameIndex}-${diff}`)) {
+        ['easy', 'medium', 'hard'].forEach((diff, dIdx) => {
+            const levelRange = dIdx === 0 ? [0, 1, 2] : dIdx === 1 ? [3, 4, 5] : [6, 7, 8];
+            levelRange.forEach(lIdx => {
+                if (completedLevels.includes(`${module.id}-${lIdx}-${diff}`)) {
                     completed++;
                 }
             });
@@ -141,13 +142,15 @@ const Roadmap = () => {
                         <div className="flex flex-col items-center py-10 w-full max-w-[768px] mx-auto overflow-visible">
                             {['easy', 'medium', 'hard'].map((difficulty, index) => {
                                 const isLocked = !isLevelUnlocked(activeModule.id, 0, difficulty);
-                                const totalInDifficulty = activeModule.games.length;
-                                const completedInDifficulty = activeModule.games.filter((_, gIdx) =>
-                                    completedLevels.includes(`${activeModule.id}-${gIdx}-${difficulty}`)
+                                const difficultyIndex = index; // 0 for easy, 1 for medium, 2 for hard
+                                const levelRange = difficultyIndex === 0 ? [0, 1, 2] : difficultyIndex === 1 ? [3, 4, 5] : [6, 7, 8];
+
+                                const completedInDifficulty = levelRange.filter(lIdx =>
+                                    completedLevels.includes(`${activeModule.id}-${lIdx}-${difficulty}`)
                                 ).length;
 
-                                const isCompleted = completedInDifficulty === totalInDifficulty;
-                                const progress = totalInDifficulty > 0 ? completedInDifficulty / totalInDifficulty : 0;
+                                const isCompleted = completedInDifficulty === 3;
+                                const progress = completedInDifficulty / 3;
                                 const isEven = index % 2 === 0;
 
                                 return (
@@ -157,7 +160,7 @@ const Roadmap = () => {
                                             <div className="flex-shrink-0">
                                                 <RoadmapNode
                                                     level={difficulty.charAt(0).toUpperCase() + difficulty.slice(1)}
-                                                    gameTitle={`${completedInDifficulty}/${totalInDifficulty} Challenges`}
+                                                    gameTitle={`${completedInDifficulty}/3 Challenges`}
                                                     status={{
                                                         isLocked,
                                                         isCompleted,
@@ -191,7 +194,7 @@ const Roadmap = () => {
                                                         ? `Mastered all ${difficulty} challenges!`
                                                         : isLocked
                                                             ? `Complete all ${index === 1 ? 'Easy' : 'Medium'} games to unlock.`
-                                                            : `Complete ${totalInDifficulty - completedInDifficulty} more to unlock next level.`}
+                                                            : `Complete ${3 - completedInDifficulty} more to unlock next level.`}
                                                 </p>
                                             </div>
                                         </div>

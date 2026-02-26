@@ -82,12 +82,12 @@ const Navbar = () => {
 
                     {user ? (
                         <div className="flex items-center gap-4 ml-2">
-                            <div className="flex items-center gap-2 px-3 py-1.5 bg-quest-text/5 border border-quest-text/10 rounded-xl">
-                                <div className="w-6 h-6 bg-quest-primary/20 rounded-full flex items-center justify-center text-[10px] font-bold text-quest-primary">
+                            <Link to="/profile" className="flex items-center gap-2 px-3 py-1.5 bg-quest-text/5 border border-quest-text/10 rounded-xl hover:bg-quest-text/10 transition-colors group">
+                                <div className="w-6 h-6 bg-quest-primary/20 rounded-full flex items-center justify-center text-[10px] font-bold text-quest-primary group-hover:bg-quest-primary/30 transition-colors">
                                     {user.name[0].toUpperCase()}
                                 </div>
                                 <span className="text-sm font-medium text-quest-text">{user.name}</span>
-                            </div>
+                            </Link>
                             <button
                                 onClick={logout}
                                 className="text-sm text-quest-muted hover:text-rose-400 transition-colors"
@@ -142,7 +142,11 @@ const Navbar = () => {
                             ))}
                             {user ? (
                                 <div className="space-y-4 pt-4 border-t border-white/5">
-                                    <div className="flex items-center gap-3 px-2">
+                                    <Link
+                                        to="/profile"
+                                        onClick={() => setIsOpen(false)}
+                                        className="flex items-center gap-3 px-2 py-2 hover:bg-white/5 rounded-xl transition-colors"
+                                    >
                                         <div className="w-10 h-10 bg-quest-primary/20 rounded-full flex items-center justify-center text-sm font-bold text-quest-primary">
                                             {user.name[0].toUpperCase()}
                                         </div>
@@ -150,7 +154,7 @@ const Navbar = () => {
                                             <div className="text-quest-text font-medium">{user.name}</div>
                                             <div className="text-xs text-quest-muted">{user.email}</div>
                                         </div>
-                                    </div>
+                                    </Link>
                                     <button
                                         onClick={() => {
                                             logout();

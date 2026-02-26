@@ -1,11 +1,11 @@
 const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? '/api' : 'http://localhost:5000/api');
 
 const api = {
-    async register(name, email, password) {
+    async register(name, email, password, dob) {
         const response = await fetch(`${API_URL}/users`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ name, email, password }),
+            body: JSON.stringify({ name, email, password, dob }),
         });
         const data = await response.json();
         if (!response.ok) throw new Error(data.message || 'Signup failed');
@@ -69,6 +69,19 @@ const api = {
         });
         const data = await response.json();
         if (!response.ok) throw new Error(data.message || 'Failed to fetch rank');
+        return data;
+    },
+    async updateProfile(token, profileData) {
+        const response = await fetch(`${API_URL}/users/profile`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify(profileData),
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.message || 'Failed to update profile');
         return data;
     },
 };

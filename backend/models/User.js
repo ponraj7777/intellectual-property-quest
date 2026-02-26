@@ -35,6 +35,14 @@ const userSchema = mongoose.Schema(
                 },
             },
         ],
+        dob: {
+            type: String,
+            default: '2000-01-01'
+        },
+        profilePic: {
+            type: String, // Store as base64 or URL
+            default: ''
+        }
     },
     {
         timestamps: true,

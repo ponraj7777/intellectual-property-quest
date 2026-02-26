@@ -6,7 +6,8 @@ import {
     updateProgress,
     addXP,
     getLeaderboard,
-    getUserRank
+    getUserRank,
+    updateUserProfile
 } from '../controllers/userController.js';
 import { protect } from '../middleware/authMiddleware.js';
 
@@ -17,6 +18,7 @@ router.post('/login', authUser);
 router.get('/leaderboard', getLeaderboard);
 router.get('/profile', protect, getUserProfile);
 router.get('/rank', protect, getUserRank);
+router.put('/profile', protect, updateUserProfile);
 router.put('/progress', protect, updateProgress);
 router.put('/xp', protect, addXP);
 

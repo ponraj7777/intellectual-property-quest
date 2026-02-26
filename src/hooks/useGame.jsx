@@ -91,9 +91,9 @@ export const GameProvider = ({ children }) => {
         }
     };
 
-    const signupUser = async (name, email, password) => {
+    const signupUser = async (name, email, password, dob) => {
         try {
-            const data = await api.register(name, email, password);
+            const data = await api.register(name, email, password, dob);
             processUserData(data);
             toast.success(`Account created! Welcome, ${data.name}!`);
             return data;
@@ -205,15 +205,15 @@ export const GameProvider = ({ children }) => {
         if (!module) return false;
 
         if (difficulty === 'medium') {
-            // Unlocks if ALL easy games in this module are completed
-            return module.games.every((_, index) =>
+            // Unlocks if first 3 levels (0, 1, 2) are completed in 'easy'
+            return [0, 1, 2].every(index =>
                 completedLevels.includes(`${moduleId}-${index}-easy`)
             );
         }
 
         if (difficulty === 'hard') {
-            // Unlocks if ALL medium games in this module are completed
-            return module.games.every((_, index) =>
+            // Unlocks if levels 3, 4, 5 are completed in 'medium'
+            return [3, 4, 5].every(index =>
                 completedLevels.includes(`${moduleId}-${index}-medium`)
             );
         }
@@ -252,11 +252,24 @@ export const GameProvider = ({ children }) => {
         toast.info("Journey Reset!");
     };
 
+    const updateProfile = async (profileData) => {
+        if (!user?.token) return;
+        try {
+            const data = await api.updateProfile(user.token, profileData);
+            setUser(prev => ({ ...prev, ...data }));
+            toast.success("Profile updated successfully!");
+            return data;
+        } catch (error) {
+            toast.error(error.message);
+            throw error;
+        }
+    };
+
     return (
         <GameContext.Provider value={{
             user, xp, level, completedModules, completedLevels, badges, XP_THRESHOLDS,
             login: loginUser, signup: signupUser, logout, addXp, completeLevel, completeModule, unlockBadge,
-            isLevelUnlocked, isDifficultyUnlocked, getNextMilestone, resetProgress
+            isLevelUnlocked, isDifficultyUnlocked, getNextMilestone, resetProgress, updateProfile
         }}>
             {children}
         </GameContext.Provider>

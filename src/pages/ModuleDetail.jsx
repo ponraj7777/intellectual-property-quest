@@ -179,70 +179,77 @@ const ModuleDetail = () => {
                                         </div>
                                     </div>
                                     <div className="grid grid-cols-1 gap-4">
-                                        {module.games.map((game, index) => {
-                                            const unlocked = isLevelUnlocked(module.id, index, difficulty);
-                                            return (
-                                                <button
-                                                    key={index}
-                                                    disabled={!unlocked}
-                                                    onClick={() => setActiveGameIndex(index)}
-                                                    className={`glass-panel p-6 rounded-xl text-left transition-all group flex items-center justify-between
-                                                        ${unlocked ? 'hover:border-quest-primary/50' : 'opacity-60 grayscale cursor-not-allowed'}
-                                                    `}
-                                                >
-                                                    <div className="flex items-center gap-4">
-                                                        <div className={`p-4 rounded-xl ${!unlocked ? 'bg-white/5 text-white/20' :
-                                                            game.type === 'quiz' ? 'bg-blue-500/20 text-blue-400' :
-                                                                game.type === 'sorter' ? 'bg-emerald-500/20 text-emerald-400' :
-                                                                    game.type === 'match' ? 'bg-purple-500/20 text-purple-400' :
-                                                                        game.type === 'spin' ? 'bg-orange-500/20 text-orange-400' :
-                                                                            game.type === 'snake' ? 'bg-amber-500/20 text-amber-400' :
-                                                                                'bg-pink-500/20 text-pink-400'
-                                                            }`}>
-                                                            {!unlocked ? <Lock className="w-6 h-6" /> : (
-                                                                <>
-                                                                    {game.type === 'quiz' && <List className="w-6 h-6" />}
-                                                                    {game.type === 'sorter' && <Calculator className="w-6 h-6" />}
-                                                                    {game.type === 'match' && <List className="w-6 h-6" />}
-                                                                    {game.type === 'spin' && <RotateCw className="w-6 h-6" />}
-                                                                    {game.type === 'guess' && <HelpCircle className="w-6 h-6" />}
-                                                                    {game.type === 'snake' && <Trophy className="w-6 h-6" />}
-                                                                    {game.type === 'archery' && <Target className="w-6 h-6" />}
-                                                                    {game.type === 'reverse-hangman' && <Target className="w-6 h-6" />}
-                                                                </>
-                                                            )}
-                                                        </div>
-                                                        <div>
-                                                            <div className="flex items-center gap-2">
-                                                                <span className="text-[10px] font-black uppercase tracking-widest text-quest-muted">Challenge {index + 1}</span>
-                                                                {completedLevels.includes(`${module.id}-${index}-${difficulty}`) ? (
-                                                                    <span className="text-[10px] px-1.5 py-0.5 rounded font-bold uppercase bg-green-500/20 text-green-400">
-                                                                        Completed
-                                                                    </span>
-                                                                ) : (
-                                                                    <span className={`text-[10px] px-1.5 py-0.5 rounded font-bold uppercase ${!unlocked ? 'bg-red-500/10 text-red-400' : 'bg-quest-primary/10 text-quest-primary'
-                                                                        }`}>
-                                                                        {difficulty} {unlocked ? 'Unlocked' : 'Locked'}
-                                                                    </span>
+                                        {(() => {
+                                            const difficultyIndex = ['easy', 'medium', 'hard'].indexOf(difficulty);
+                                            const startIndex = difficultyIndex * 3;
+                                            const displayGames = module.games.slice(startIndex, startIndex + 3);
+
+                                            return displayGames.map((game, relativeIndex) => {
+                                                const globalIndex = startIndex + relativeIndex;
+                                                const unlocked = isLevelUnlocked(module.id, globalIndex, difficulty);
+                                                return (
+                                                    <button
+                                                        key={globalIndex}
+                                                        disabled={!unlocked}
+                                                        onClick={() => setActiveGameIndex(globalIndex)}
+                                                        className={`glass-panel p-6 rounded-xl text-left transition-all group flex items-center justify-between
+                                                            ${unlocked ? 'hover:border-quest-primary/50' : 'opacity-60 grayscale cursor-not-allowed'}
+                                                        `}
+                                                    >
+                                                        <div className="flex items-center gap-4">
+                                                            <div className={`p-4 rounded-xl ${!unlocked ? 'bg-white/5 text-white/20' :
+                                                                game.type === 'quiz' ? 'bg-blue-500/20 text-blue-400' :
+                                                                    game.type === 'sorter' ? 'bg-emerald-500/20 text-emerald-400' :
+                                                                        game.type === 'match' ? 'bg-purple-500/20 text-purple-400' :
+                                                                            game.type === 'spin' ? 'bg-orange-500/20 text-orange-400' :
+                                                                                game.type === 'snake' ? 'bg-amber-500/20 text-amber-400' :
+                                                                                    'bg-pink-500/20 text-pink-400'
+                                                                }`}>
+                                                                {!unlocked ? <Lock className="w-6 h-6" /> : (
+                                                                    <>
+                                                                        {game.type === 'quiz' && <List className="w-6 h-6" />}
+                                                                        {game.type === 'sorter' && <Calculator className="w-6 h-6" />}
+                                                                        {game.type === 'match' && <List className="w-6 h-6" />}
+                                                                        {game.type === 'spin' && <RotateCw className="w-6 h-6" />}
+                                                                        {game.type === 'guess' && <HelpCircle className="w-6 h-6" />}
+                                                                        {game.type === 'snake' && <Trophy className="w-6 h-6" />}
+                                                                        {game.type === 'archery' && <Target className="w-6 h-6" />}
+                                                                        {game.type === 'reverse-hangman' && <Target className="w-6 h-6" />}
+                                                                    </>
                                                                 )}
                                                             </div>
-                                                            <h3 className={`text-lg font-bold transition-colors ${unlocked ? 'group-hover:text-quest-primary' : 'text-white/30'}`}>
-                                                                {game.title}
-                                                            </h3>
-                                                            <p className="text-sm text-quest-muted">
-                                                                {completedLevels.includes(`${module.id}-${index}-${difficulty}`)
-                                                                    ? 'Challenge mastered!'
-                                                                    : unlocked
-                                                                        ? game.description
-                                                                        : 'Complete previous difficulty to unlock'
-                                                                }
-                                                            </p>
+                                                            <div>
+                                                                <div className="flex items-center gap-2">
+                                                                    <span className="text-[10px] font-black uppercase tracking-widest text-quest-muted">Level {relativeIndex + 1}</span>
+                                                                    {completedLevels.includes(`${module.id}-${globalIndex}-${difficulty}`) ? (
+                                                                        <span className="text-[10px] px-1.5 py-0.5 rounded font-bold uppercase bg-green-500/20 text-green-400">
+                                                                            Completed
+                                                                        </span>
+                                                                    ) : (
+                                                                        <span className={`text-[10px] px-1.5 py-0.5 rounded font-bold uppercase ${!unlocked ? 'bg-red-500/10 text-red-400' : 'bg-quest-primary/10 text-quest-primary'
+                                                                            }`}>
+                                                                            {difficulty} {unlocked ? 'Unlocked' : 'Locked'}
+                                                                        </span>
+                                                                    )}
+                                                                </div>
+                                                                <h3 className={`text-lg font-bold transition-colors ${unlocked ? 'group-hover:text-quest-primary' : 'text-white/30'}`}>
+                                                                    {game.title}
+                                                                </h3>
+                                                                <p className="text-sm text-quest-muted">
+                                                                    {completedLevels.includes(`${module.id}-${globalIndex}-${difficulty}`)
+                                                                        ? 'Challenge mastered!'
+                                                                        : unlocked
+                                                                            ? game.description
+                                                                            : 'Complete previous level to unlock'
+                                                                    }
+                                                                </p>
+                                                            </div>
                                                         </div>
-                                                    </div>
-                                                    {unlocked && <ChevronRight className="w-5 h-5 text-quest-muted group-hover:translate-x-1 transition-transform" />}
-                                                </button>
-                                            );
-                                        })}
+                                                        {unlocked && <ChevronRight className="w-5 h-5 text-quest-muted group-hover:translate-x-1 transition-transform" />}
+                                                    </button>
+                                                );
+                                            });
+                                        })()}
                                     </div>
                                 </div>
                             )}

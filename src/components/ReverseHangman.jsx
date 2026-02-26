@@ -201,7 +201,7 @@ const ReverseHangman = ({ gameData, moduleId, levelIndex, difficulty }) => {
                                     key="rope"
                                     d={`M ${hookX} ${hookY} Q ${hookX + ropeSlack} ${hookY + (attachmentY - hookY) / 2}, ${hookX} ${attachmentY}`}
                                     fill="none"
-                                    stroke="#8B4513"
+                                    stroke="#D97706"
                                     strokeWidth="5"
                                     initial={false}
                                     animate={{
@@ -217,7 +217,7 @@ const ReverseHangman = ({ gameData, moduleId, levelIndex, difficulty }) => {
                         <motion.g
                             initial={false}
                             animate={{
-                                y: gameState === 'lost' ? groundY + 20 : (isReleased ? landingY : attachmentY - 32),
+                                y: gameState === 'lost' ? groundY + 20 : (isReleased ? landingY : attachmentY - (32 - (isLoose ? 22 : 12) - 2)),
                                 x: hookX,
                                 rotate: gameState === 'lost' ? [0, 45, 90] : 0,
                                 opacity: gameState === 'lost' ? [1, 1, 0] : 1
@@ -229,7 +229,7 @@ const ReverseHangman = ({ gameData, moduleId, levelIndex, difficulty }) => {
                             }}
                         >
                             {/* Inner character group, centered horizontally and vertically at neck attachment */}
-                            <g transform="translate(-50, 0)">
+                            <g transform="translate(-50, 0)" className="fill-quest-text stroke-quest-text">
                                 <svg width="100" height="100" viewBox="0 0 100 100" className="overflow-visible">
                                     {/* Neck Loop (Noose) - Rendering first so it stays BEHIND the head/body */}
                                     {(!isReleased && gameState !== 'lost') && (
@@ -238,30 +238,30 @@ const ReverseHangman = ({ gameData, moduleId, levelIndex, difficulty }) => {
                                                 cx="50" cy="32"
                                                 r={isLoose ? 22 : 12}
                                                 fill="none"
-                                                stroke="#8B4513"
-                                                strokeWidth="3"
+                                                stroke="#D97706"
+                                                strokeWidth="4"
                                                 className="transition-all duration-500"
                                             />
                                             {/* Tied Knot part at the top of the loop */}
-                                            <rect x="46" y={32 - (isLoose ? 22 : 12) - 2} width="8" height="6" fill="#8B4513" rx="1" />
+                                            <rect x="46" y={32 - (isLoose ? 22 : 12) - 2} width="8" height="6" fill="#D97706" rx="1" />
                                         </g>
                                     )}
 
                                     {/* Head */}
-                                    <circle cx="50" cy="20" r="15" fill={gameState === 'lost' ? "#ef4444" : "black"} stroke={gameState === 'lost' ? "#b91c1c" : "black"} strokeWidth="4" />
+                                    <circle cx="50" cy="20" r="15" fill={gameState === 'lost' ? "#ef4444" : "currentColor"} stroke={gameState === 'lost' ? "#b91c1c" : "currentColor"} strokeWidth="4" />
                                     {/* Body */}
-                                    <line x1="50" y1="35" x2="50" y2="70" stroke={gameState === 'lost' ? "#ef4444" : "black"} strokeWidth="4" strokeLinecap="round" />
+                                    <line x1="50" y1="35" x2="50" y2="70" stroke={gameState === 'lost' ? "#ef4444" : "currentColor"} strokeWidth="4" strokeLinecap="round" />
                                     {/* Arms */}
-                                    <motion.line x1="50" y1="45" x2="20" y2="35" stroke={gameState === 'lost' ? "#ef4444" : "black"} strokeWidth="4" strokeLinecap="round"
+                                    <motion.line x1="50" y1="45" x2="20" y2="35" stroke={gameState === 'lost' ? "#ef4444" : "currentColor"} strokeWidth="4" strokeLinecap="round"
                                         animate={{ rotate: (isReleased || gameState === 'lost') ? [-20, 20, -20] : 0 }}
                                         transition={{ repeat: gameState === 'lost' ? Infinity : 0, duration: 0.5 }} />
-                                    <motion.line x1="50" y1="45" x2="80" y2="35" stroke={gameState === 'lost' ? "#ef4444" : "black"} strokeWidth="4" strokeLinecap="round"
+                                    <motion.line x1="50" y1="45" x2="80" y2="35" stroke={gameState === 'lost' ? "#ef4444" : "currentColor"} strokeWidth="4" strokeLinecap="round"
                                         animate={{ rotate: (isReleased || gameState === 'lost') ? [20, -20, 20] : 0 }}
                                         transition={{ repeat: gameState === 'lost' ? Infinity : 0, duration: 0.5 }} />
                                     {/* Legs */}
-                                    <motion.line x1="50" y1="70" x2="35" y2="95" stroke={gameState === 'lost' ? "#ef4444" : "black"} strokeWidth="4" strokeLinecap="round"
+                                    <motion.line x1="50" y1="70" x2="35" y2="95" stroke={gameState === 'lost' ? "#ef4444" : "currentColor"} strokeWidth="4" strokeLinecap="round"
                                         animate={{ rotate: gameState === 'lost' ? [0, 30, -30] : 0 }} />
-                                    <motion.line x1="50" y1="70" x2="65" y2="95" stroke={gameState === 'lost' ? "#ef4444" : "black"} strokeWidth="4" strokeLinecap="round"
+                                    <motion.line x1="50" y1="70" x2="65" y2="95" stroke={gameState === 'lost' ? "#ef4444" : "currentColor"} strokeWidth="4" strokeLinecap="round"
                                         animate={{ rotate: gameState === 'lost' ? [0, -30, 30] : 0 }} />
                                 </svg>
                             </g>

@@ -13,7 +13,7 @@ const generateToken = (id) => {
 // @route   POST /api/users
 // @access  Public
 const registerUser = async (req, res) => {
-    const { name, email, password } = req.body;
+    const { name, email, password, dob } = req.body;
 
     const userExists = await User.findOne({ email });
 
@@ -28,7 +28,8 @@ const registerUser = async (req, res) => {
         password, // Hashing is handled by User model pre-save hook
         xp: 0,
         level: 1,
-        completedLevels: []
+        completedLevels: [],
+        dob: dob || '2000-01-01'
     });
 
     if (user) {
@@ -39,6 +40,9 @@ const registerUser = async (req, res) => {
             xp: user.xp,
             level: user.level,
             completedLevels: user.completedLevels,
+            dob: user.dob,
+            joinedAt: user.createdAt,
+            profilePic: user.profilePic,
             token: generateToken(user._id),
         });
     } else {
@@ -62,6 +66,9 @@ const authUser = async (req, res) => {
             xp: user.xp,
             level: user.level,
             completedLevels: user.completedLevels,
+            dob: user.dob,
+            joinedAt: user.createdAt,
+            profilePic: user.profilePic,
             token: generateToken(user._id),
         });
     } else {
@@ -83,6 +90,9 @@ const getUserProfile = async (req, res) => {
             xp: user.xp,
             level: user.level,
             completedLevels: user.completedLevels,
+            dob: user.dob,
+            joinedAt: user.createdAt,
+            profilePic: user.profilePic,
         });
     } else {
         res.status(404).json({ message: 'User not found' });
@@ -181,4 +191,35 @@ const getLeaderboard = async (req, res) => {
     }
 };
 
-export { registerUser, authUser, getUserProfile, updateProgress, addXP, getLeaderboard, getUserRank };
+// @desc    Update user profile
+// @route   PUT /api/users/profile
+// @access  Private
+const updateUserProfile = async (req, res) => {
+    const user = await User.findById(req.user._id);
+
+    if (user) {
+        user.name = req.body.name || user.name;
+        user.dob = req.body.dob || user.dob;
+        if (req.body.profilePic) {
+            user.profilePic = req.body.profilePic;
+        }
+
+        const updatedUser = await user.save();
+
+        res.json({
+            _id: updatedUser._id,
+            name: updatedUser.name,
+            email: updatedUser.email,
+            xp: updatedUser.xp,
+            level: updatedUser.level,
+            completedLevels: updatedUser.completedLevels,
+            dob: updatedUser.dob,
+            joinedAt: updatedUser.createdAt,
+            profilePic: updatedUser.profilePic
+        });
+    } else {
+        res.status(404).json({ message: 'User not found' });
+    }
+};
+
+export { registerUser, authUser, getUserProfile, updateProgress, addXP, getLeaderboard, getUserRank, updateUserProfile };
