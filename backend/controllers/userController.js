@@ -13,45 +13,40 @@ const generateToken = (id) => {
 // @route   POST /api/users
 // @access  Public
 const registerUser = async (req, res) => {
-    try {
-        const { name, email, password, dob } = req.body;
+    const { name, email, password, dob } = req.body;
 
-        const userExists = await User.findOne({ email });
+    const userExists = await User.findOne({ email });
 
-        if (userExists) {
-            res.status(400).json({ message: 'User already exists' });
-            return;
-        }
+    if (userExists) {
+        res.status(400).json({ message: 'User already exists' });
+        return;
+    }
 
-        const user = await User.create({
-            name,
-            email,
-            password, // Hashing is handled by User model pre-save hook
-            xp: 0,
-            level: 1,
-            completedLevels: [],
-            dob: dob || '2000-01-01'
+    const user = await User.create({
+        name,
+        email,
+        password, // Hashing is handled by User model pre-save hook
+        xp: 0,
+        level: 1,
+        completedLevels: [],
+        dob: dob || '2000-01-01'
+    });
+
+    if (user) {
+        res.status(201).json({
+            _id: user._id,
+            name: user.name,
+            email: user.email,
+            xp: user.xp,
+            level: user.level,
+            completedLevels: user.completedLevels,
+            dob: user.dob,
+            joinedAt: user.createdAt,
+            profilePic: user.profilePic,
+            token: generateToken(user._id),
         });
-
-        if (user) {
-            res.status(201).json({
-                _id: user._id,
-                name: user.name,
-                email: user.email,
-                xp: user.xp,
-                level: user.level,
-                completedLevels: user.completedLevels,
-                dob: user.dob,
-                joinedAt: user.createdAt,
-                profilePic: user.profilePic,
-                token: generateToken(user._id),
-            });
-        } else {
-            res.status(400).json({ message: 'Invalid user data' });
-        }
-    } catch (error) {
-        console.error('Registration error:', error);
-        res.status(500).json({ message: error.message || 'Server Error during registration' });
+    } else {
+        res.status(400).json({ message: 'Invalid user data' });
     }
 };
 
