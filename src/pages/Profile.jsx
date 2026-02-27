@@ -14,7 +14,8 @@ import {
     Camera,
     Save,
     X,
-    CheckCircle2
+    CheckCircle2,
+    Lock
 } from 'lucide-react';
 import { useGame } from '../hooks/useGame';
 import { useNavigate } from 'react-router-dom';
@@ -235,6 +236,105 @@ const Profile = () => {
                                     </div>
                                 </motion.div>
                             ))}
+                        </div>
+
+                        {/* Achievements Trophy Case */}
+                        <div className="space-y-6 pt-4">
+                            <div className="flex items-center gap-4">
+                                <div className="w-1.5 h-8 bg-quest-secondary rounded-full shadow-lg shadow-quest-secondary/40" />
+                                <h2 className="text-2xl font-black text-quest-text uppercase tracking-tight">Trophy Case</h2>
+                            </div>
+
+                            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                                {(() => {
+                                    const badgeCategories = [
+                                        { id: 'patents', name: 'Patents', icon: '⚙️', diffNames: ['Patent Apprentice', 'Patent Specialist', 'Patent Grandmaster'] },
+                                        { id: 'copyrights', name: 'Copyrights', icon: '©', diffNames: ['Copyright Novice', 'Copyright Expert', 'Copyright Legend'] },
+                                        { id: 'trademarks', name: 'Trademarks', icon: '™', diffNames: ['Brand Scout', 'Brand Guard', 'Brand Visionary'] },
+                                        { id: 'trade-secrets', name: 'Trade Secrets', icon: '🤫', diffNames: ['Secret Seeker', 'Vault Keeper', 'Shadow Guardian'] },
+                                    ];
+
+                                    const badgeList = [];
+                                    badgeCategories.forEach(cat => {
+                                        ['easy', 'medium', 'hard'].forEach((diff, idx) => {
+                                            badgeList.push({
+                                                id: `${cat.id}_${diff}`,
+                                                category: cat.name,
+                                                difficulty: diff,
+                                                icon: cat.icon,
+                                                name: cat.diffNames[idx]
+                                            });
+                                        });
+                                    });
+
+                                    return badgeList.map((badge) => {
+                                        const isEarned = user?.badges?.some(b => b.badgeId === badge.id);
+                                        const progress = completedLevels?.filter(l => {
+                                            const [modId, , diff] = l.split('-');
+                                            return modId === badge.id.split('_')[0] && diff === badge.difficulty;
+                                        }).length || 0;
+
+                                        const percent = Math.min((progress / 3) * 100, 100);
+
+                                        return (
+                                            <motion.div
+                                                key={badge.id}
+                                                whileHover={isEarned ? { scale: 1.05, y: -5 } : {}}
+                                                className={`relative p-6 rounded-3xl border flex flex-col items-center text-center transition-all duration-500 ${isEarned
+                                                        ? 'bg-gradient-to-br from-quest-primary/25 via-quest-primary/10 to-transparent border-quest-primary/50 shadow-[0_20px_40px_-15px_rgba(var(--color-primary),0.3)] glow-pulse'
+                                                        : 'bg-quest-text/5 border-quest-text/10'
+                                                    }`}
+                                            >
+                                                {/* Unlock/Lock Icon */}
+                                                <div className="absolute top-3 right-3">
+                                                    {isEarned ? (
+                                                        <div className="bg-quest-primary p-1.5 rounded-full shadow-lg shadow-quest-primary/40 animate-bounce-subtle">
+                                                            <Trophy className="w-3.5 h-3.5 text-white" />
+                                                        </div>
+                                                    ) : (
+                                                        <div className="p-1.5 rounded-full bg-quest-text/10">
+                                                            <Lock className="w-3.5 h-3.5 text-quest-muted/50" />
+                                                        </div>
+                                                    )}
+                                                </div>
+
+                                                <div className={`text-5xl mb-4 transition-all duration-700 ${isEarned ? 'scale-110 drop-shadow-[0_10px_10px_rgba(var(--color-primary),0.2)]' : 'grayscale contrast-50 opacity-20'}`}>
+                                                    {badge.icon}
+                                                </div>
+
+                                                <div className={`text-xs font-black uppercase tracking-widest mb-3 ${isEarned ? 'text-quest-primary' : 'text-quest-muted'}`}>
+                                                    {badge.name}
+                                                </div>
+
+                                                {/* Progress Bar Container */}
+                                                <div className="w-full mt-auto pt-2">
+                                                    <div className="flex justify-between text-[9px] font-black text-quest-muted mb-1.5 px-0.5">
+                                                        <span className={isEarned ? 'text-quest-primary' : ''}>{isEarned ? 'UNLOCKED' : `${progress}/3`}</span>
+                                                        <span>{Math.round(percent)}%</span>
+                                                    </div>
+                                                    <div className="h-3 bg-quest-text/10 rounded-full border border-quest-text/5 p-[2px] shadow-inner mb-2">
+                                                        <motion.div
+                                                            initial={{ width: 0 }}
+                                                            animate={{ width: `${percent}%` }}
+                                                            className={`h-full rounded-full transition-all duration-1000 ${isEarned
+                                                                    ? 'bg-gradient-to-r from-quest-primary to-quest-accent'
+                                                                    : 'bg-quest-primary/40'
+                                                                }`}
+                                                        />
+                                                    </div>
+                                                    {isEarned && (
+                                                        <span className="text-[10px] font-black text-quest-primary uppercase tracking-[0.2em]">Mastery Unlocked</span>
+                                                    )}
+                                                </div>
+
+                                                {isEarned && (
+                                                    <div className="absolute -inset-[1px] rounded-2xl bg-gradient-to-tr from-quest-primary/20 to-transparent pointer-events-none opacity-50" />
+                                                )}
+                                            </motion.div>
+                                        );
+                                    });
+                                })()}
+                            </div>
                         </div>
                     </div>
 

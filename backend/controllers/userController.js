@@ -1,6 +1,7 @@
 import User from '../models/User.js';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
+import { checkNewBadges } from '../utils/badgeRules.js';
 
 // Generate JWT
 const generateToken = (id) => {
@@ -113,11 +114,21 @@ const updateProgress = async (req, res) => {
 
         if (!alreadyCompleted) {
             user.completedLevels.push({ moduleId, levelIndex, difficulty });
-            await user.save();
-            res.json({ message: 'Progress updated', completedLevels: user.completedLevels });
-        } else {
-            res.json({ message: 'Already completed', completedLevels: user.completedLevels });
         }
+
+        // Always check for new badges (handles retroactive awards)
+        const newBadges = checkNewBadges(user);
+        if (newBadges.length > 0) {
+            user.badges.push(...newBadges);
+        }
+
+        await user.save();
+        res.json({
+            message: alreadyCompleted ? 'Already completed' : 'Progress updated',
+            completedLevels: user.completedLevels,
+            badges: user.badges,
+            newBadges: newBadges
+        });
     } else {
         res.status(404).json({ message: 'User not found' });
     }
@@ -139,13 +150,21 @@ const addXP = async (req, res) => {
             user.level = newLevel;
         }
 
+        // Check for new badges
+        const newBadges = checkNewBadges(user);
+        if (newBadges.length > 0) {
+            user.badges.push(...newBadges);
+        }
+
         await user.save();
         res.json({
             xp: user.xp,
             level: user.level,
             name: user.name,
             email: user.email,
-            completedLevels: user.completedLevels
+            completedLevels: user.completedLevels,
+            badges: user.badges,
+            newBadges: newBadges
         });
     } else {
         res.status(404).json({ message: 'User not found' });
@@ -184,7 +203,7 @@ const getLeaderboard = async (req, res) => {
         const topUsers = await User.find({})
             .sort({ xp: -1, level: -1 })
             .limit(10)
-            .select('name xp level profilePic');
+            .select('name xp level profilePic badges');
         res.json(topUsers);
     } catch (error) {
         res.status(500).json({ message: 'Error fetching leaderboard' });

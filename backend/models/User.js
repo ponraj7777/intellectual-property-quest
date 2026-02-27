@@ -42,7 +42,16 @@ const userSchema = mongoose.Schema(
         profilePic: {
             type: String, // Store as base64 or URL
             default: ''
-        }
+        },
+        badges: [
+            {
+                badgeId: String,
+                awardedAt: {
+                    type: Date,
+                    default: Date.now,
+                },
+            },
+        ],
     },
     {
         timestamps: true,

@@ -59,6 +59,12 @@ export const GameProvider = ({ children }) => {
                         await api.addXP(user.token, diff);
                     }
 
+                    // Sync badges
+                    if (profile.badges) {
+                        setBadges(profile.badges);
+                        setUser(prev => ({ ...prev, badges: profile.badges }));
+                    }
+
                     // Match backend format [ {moduleId, levelIndex, difficulty} ] to frontend format [ "moduleId-levelIndex-difficulty" ]
                     if (profile.completedLevels) {
                         const formattedCompletedLevels = profile.completedLevels.map(
@@ -128,6 +134,10 @@ export const GameProvider = ({ children }) => {
             );
             setCompletedLevels(prev => [...new Set([...prev, ...formatted])]);
         }
+
+        if (data.badges) {
+            setBadges(data.badges);
+        }
     };
 
     const logout = () => {
@@ -159,7 +169,17 @@ export const GameProvider = ({ children }) => {
 
         if (user?.token) {
             try {
-                await api.addXP(user.token, amount);
+                const data = await api.addXP(user.token, amount);
+                if (data.newBadges && data.newBadges.length > 0) {
+                    data.newBadges.forEach(b => toast.success(`🏆 New Badge: ${b.badgeId.replace(/_/g, ' ').toUpperCase()}!`));
+                }
+                // Sync everything from server
+                setBadges(data.badges || []);
+                if (data.completedLevels) {
+                    const formatted = data.completedLevels.map(l => `${l.moduleId}-${l.levelIndex}-${l.difficulty}`);
+                    setCompletedLevels(formatted);
+                }
+                setUser(prev => ({ ...prev, ...data }));
             } catch (error) {
                 console.error("Failed to update XP on server:", error);
             }
@@ -179,7 +199,17 @@ export const GameProvider = ({ children }) => {
 
             if (user?.token) {
                 try {
-                    await api.updateProgress(user.token, moduleId, levelIndex, difficulty);
+                    const data = await api.updateProgress(user.token, moduleId, levelIndex, difficulty);
+                    if (data.newBadges && data.newBadges.length > 0) {
+                        data.newBadges.forEach(b => toast.success(`🏆 New Badge: ${b.badgeId.replace(/_/g, ' ').toUpperCase()}!`));
+                    }
+                    // Sync everything from server
+                    setBadges(data.badges || []);
+                    if (data.completedLevels) {
+                        const formatted = data.completedLevels.map(l => `${l.moduleId}-${l.levelIndex}-${l.difficulty}`);
+                        setCompletedLevels(formatted);
+                    }
+                    setUser(prev => ({ ...prev, ...data }));
                 } catch (error) {
                     console.error("Failed to update progress on server:", error);
                 }
