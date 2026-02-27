@@ -54,8 +54,12 @@ const Leaderboard = () => {
                 <div className="glass-panel p-6 rounded-xl mb-12 flex items-center justify-between border-quest-primary/30 relative overflow-hidden">
                     <div className="absolute top-0 left-0 w-full h-full bg-quest-primary/5 z-0" />
                     <div className="relative z-10 flex items-center gap-4">
-                        <div className="w-16 h-16 rounded-full bg-quest-primary flex items-center justify-center text-xl font-bold">
-                            {user?.name?.charAt(0) || "Y"}
+                        <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-quest-primary/30 bg-quest-primary/10 flex items-center justify-center text-xl font-bold">
+                            {user?.profilePic ? (
+                                <img src={user.profilePic} alt={user.name} className="w-full h-full object-cover" />
+                            ) : (
+                                user?.name?.charAt(0) || "Y"
+                            )}
                         </div>
                         <div>
                             <h3 className="text-xl font-bold">{user?.name || "Your Rank"}</h3>
@@ -102,14 +106,24 @@ const Leaderboard = () => {
                                             }`}>
                                             {index + 1}
                                         </div>
-                                        <div>
-                                            <div className="font-bold flex items-center gap-2">
-                                                {player.name}
-                                                {user?.name === player.name && (
-                                                    <span className="text-[10px] bg-quest-primary/20 text-quest-primary px-2 py-0.5 rounded-full">YOU</span>
+
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-10 h-10 rounded-full overflow-hidden border border-white/10 bg-white/5 flex items-center justify-center text-sm font-bold">
+                                                {player.profilePic ? (
+                                                    <img src={player.profilePic} alt={player.name} className="w-full h-full object-cover" />
+                                                ) : (
+                                                    player.name?.charAt(0) || "U"
                                                 )}
                                             </div>
-                                            <div className="text-xs text-quest-muted">Level {player.xp}</div>
+                                            <div>
+                                                <div className="font-bold flex items-center gap-2">
+                                                    {player.name}
+                                                    {user?.name === player.name && (
+                                                        <span className="text-[10px] bg-quest-primary/20 text-quest-primary px-2 py-0.5 rounded-full">YOU</span>
+                                                    )}
+                                                </div>
+                                                <div className="text-xs text-quest-muted">Level {Math.floor(player.xp / 1000) + 1}</div>
+                                            </div>
                                         </div>
                                     </div>
                                     <div className="font-heading font-bold text-quest-primary">

@@ -184,7 +184,7 @@ const getLeaderboard = async (req, res) => {
         const topUsers = await User.find({})
             .sort({ xp: -1, level: -1 })
             .limit(10)
-            .select('name xp level');
+            .select('name xp level profilePic');
         res.json(topUsers);
     } catch (error) {
         res.status(500).json({ message: 'Error fetching leaderboard' });
