@@ -29,6 +29,7 @@ export const GameProvider = ({ children }) => {
     const [user, setUser] = useState(() =>
         JSON.parse(localStorage.getItem('quest_user')) || null
     );
+    const [loading, setLoading] = useState(true);
 
     // Sync state to local storage
     useEffect(() => {
@@ -44,6 +45,7 @@ export const GameProvider = ({ children }) => {
     useEffect(() => {
         const syncProfile = async () => {
             if (user?.token) {
+                setLoading(true);
                 try {
                     const profile = await api.getProfile(user.token);
 
@@ -59,10 +61,10 @@ export const GameProvider = ({ children }) => {
                         await api.addXP(user.token, diff);
                     }
 
-                    // Sync badges
-                    if (profile.badges) {
-                        setBadges(profile.badges);
-                        setUser(prev => ({ ...prev, badges: profile.badges }));
+                    // Sync profile data
+                    if (profile) {
+                        setUser(prev => ({ ...prev, ...profile }));
+                        if (profile.badges) setBadges(profile.badges);
                     }
 
                     // Match backend format [ {moduleId, levelIndex, difficulty} ] to frontend format [ "moduleId-levelIndex-difficulty" ]
@@ -77,9 +79,11 @@ export const GameProvider = ({ children }) => {
                             return combined;
                         });
                     }
-                } catch (error) {
-                    console.error("Failed to sync profile:", error);
+                } finally {
+                    setLoading(false);
                 }
+            } else {
+                setLoading(false);
             }
         };
         syncProfile();
@@ -228,32 +232,11 @@ export const GameProvider = ({ children }) => {
     };
 
     const isDifficultyUnlocked = (moduleId, difficulty) => {
-        // All Easy levels are unlocked by default for every category
-        if (difficulty === 'easy') return true;
-
-        const module = modulesData.find(m => m.id === moduleId);
-        if (!module) return false;
-
-        if (difficulty === 'medium') {
-            // Unlocks if first 3 levels (0, 1, 2) are completed in 'easy'
-            return [0, 1, 2].every(index =>
-                completedLevels.includes(`${moduleId}-${index}-easy`)
-            );
-        }
-
-        if (difficulty === 'hard') {
-            // Unlocks if levels 3, 4, 5 are completed in 'medium'
-            return [3, 4, 5].every(index =>
-                completedLevels.includes(`${moduleId}-${index}-medium`)
-            );
-        }
-
-        return false;
+        return true;
     };
 
-    const isLevelUnlocked = (moduleId, levelIndex, difficulty = 'easy') => {
-        // First check if the difficulty itself is unlocked for this module
-        return isDifficultyUnlocked(moduleId, difficulty);
+    const isLevelUnlocked = (moduleId, levelIndex, currentDifficulty = 'easy') => {
+        return true;
     };
 
     const getNextMilestone = () => {
@@ -297,7 +280,7 @@ export const GameProvider = ({ children }) => {
 
     return (
         <GameContext.Provider value={{
-            user, xp, level, completedModules, completedLevels, badges, XP_THRESHOLDS,
+            user, xp, level, completedModules, completedLevels, badges, XP_THRESHOLDS, loading,
             login: loginUser, signup: signupUser, logout, addXp, completeLevel, completeModule, unlockBadge,
             isLevelUnlocked, isDifficultyUnlocked, getNextMilestone, resetProgress, updateProfile
         }}>

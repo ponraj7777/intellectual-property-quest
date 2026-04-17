@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'sonner';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
@@ -14,9 +14,27 @@ import Login from './pages/Login';
 import Signup from './pages/Signup';
 import Roadmap from './pages/Roadmap';
 import Profile from './pages/Profile';
+import AdminDashboard from './pages/AdminDashboard';
+import QuestionManager from './pages/QuestionManager';
+import AdminLogin from './pages/AdminLogin';
 
-import { GameProvider } from './hooks/useGame';
+import { GameProvider, useGame } from './hooks/useGame';
 import { ThemeProvider } from './context/ThemeContext';
+
+const AdminProtectedRoute = ({ children }) => {
+  const { user, loading } = useGame();
+
+  if (loading) return (
+    <div className="flex items-center justify-center min-h-screen">
+      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-quest-primary"></div>
+    </div>
+  );
+
+  if (!user || !user.isAdmin) {
+    return <Navigate to="/" replace />;
+  }
+  return children;
+};
 
 function App() {
   return (
@@ -38,6 +56,23 @@ function App() {
                 <Route path="/login" element={<Login />} />
                 <Route path="/signup" element={<Signup />} />
                 <Route path="/profile" element={<Profile />} />
+                <Route path="/admin/login" element={<AdminLogin />} />
+                <Route
+                  path="/admin"
+                  element={
+                    <AdminProtectedRoute>
+                      <AdminDashboard />
+                    </AdminProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/admin/questions"
+                  element={
+                    <AdminProtectedRoute>
+                      <QuestionManager />
+                    </AdminProtectedRoute>
+                  }
+                />
               </Routes>
             </main>
 

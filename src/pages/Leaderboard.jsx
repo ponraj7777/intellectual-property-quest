@@ -121,33 +121,10 @@ const Leaderboard = () => {
                                                     {user?.name === player.name && (
                                                         <span className="text-[10px] bg-quest-primary/20 text-quest-primary px-2 py-0.5 rounded-full">YOU</span>
                                                     )}
-                                                    <div className="flex gap-1">
-                                                        {player.badges?.slice(0, 3).map((badge, bIdx) => {
-                                                            const badgeIcons = {
-                                                                'patents_easy': { icon: '⚙️', name: 'Patent Apprentice' },
-                                                                'patents_medium': { icon: '⚙️', name: 'Patent Specialist' },
-                                                                'patents_hard': { icon: '⚙️', name: 'Patent Grandmaster' },
-                                                                'copyrights_easy': { icon: '©', name: 'Copyright Novice' },
-                                                                'copyrights_medium': { icon: '©', name: 'Copyright Expert' },
-                                                                'copyrights_hard': { icon: '©', name: 'Copyright Legend' },
-                                                                'trademarks_easy': { icon: '™', name: 'Brand Scout' },
-                                                                'trademarks_medium': { icon: '™', name: 'Brand Guard' },
-                                                                'trademarks_hard': { icon: '™', name: 'Brand Visionary' },
-                                                                'trade-secrets_easy': { icon: '🤫', name: 'Secret Seeker' },
-                                                                'trade-secrets_medium': { icon: '🤫', name: 'Vault Keeper' },
-                                                                'trade-secrets_hard': { icon: '🤫', name: 'Shadow Guardian' }
-                                                            };
-                                                            const badgeData = badgeIcons[badge.badgeId] || { icon: '🏅', name: 'Achievement' };
-                                                            return (
-                                                                <span
-                                                                    key={badge.badgeId || bIdx}
-                                                                    title={badgeData.name}
-                                                                    className="text-xs transition-all cursor-help"
-                                                                >
-                                                                    {badgeData.icon}
-                                                                </span>
-                                                            );
-                                                        })}
+                                                    <div className="flex gap-1 items-center">
+                                                        {index === 0 && <span className="text-xl" title="1st Place">🥇</span>}
+                                                        {index === 1 && <span className="text-xl" title="2nd Place">🥈</span>}
+                                                        {index === 2 && <span className="text-xl" title="3rd Place">🥉</span>}
                                                     </div>
                                                 </div>
                                                 <div className="text-xs text-quest-muted">Level {Math.floor(player.xp / 1000) + 1}</div>

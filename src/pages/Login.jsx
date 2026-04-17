@@ -16,8 +16,12 @@ const Login = () => {
         setIsLoading(true);
 
         try {
-            await login(email, password);
-            navigate('/modules');
+            const loggedInUser = await login(email, password);
+            if (loggedInUser && loggedInUser.isAdmin) {
+                navigate('/admin');
+            } else {
+                navigate('/modules');
+            }
         } catch (error) {
             // Error toast is already handled in useGame
         } finally {
@@ -105,13 +109,16 @@ const Login = () => {
                         </button>
                     </form>
 
-                    <div className="mt-8 text-center border-t border-white/5 pt-6">
+                    <div className="mt-8 text-center border-t border-white/5 pt-6 space-y-4">
                         <p className="text-quest-muted">
                             Don't have an account?{' '}
                             <Link to="/signup" className="text-quest-primary font-semibold hover:underline">
                                 Create Account
                             </Link>
                         </p>
+                        <Link to="/admin/login" className="block text-xs text-quest-muted/60 hover:text-quest-primary transition-colors">
+                            Access Admin Portal
+                        </Link>
                     </div>
                 </div>
             </motion.div>

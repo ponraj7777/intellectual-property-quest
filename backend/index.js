@@ -37,7 +37,9 @@ app.use(express.json({ limit: '10mb' }));
 
 // Routes
 import userRoutes from './routes/userRoutes.js';
+import questionRoutes from './routes/questionRoutes.js';
 app.use('/api/users', userRoutes);
+app.use('/api/questions', questionRoutes);
 
 // Basic Route
 app.get('/', (req, res) => {

@@ -3,10 +3,20 @@ import Hero from '../components/Hero';
 import Features from '../components/Features';
 import ScrollReveal from '../components/ScrollReveal';
 import { BookOpen, Trophy, Users, Zap } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { useGame } from '../hooks/useGame';
+import { useEffect } from 'react';
 import ParallaxSection from '../components/ParallaxSection';
 
 const Home = () => {
+    const { user, loading } = useGame();
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        if (!loading && user?.isAdmin) {
+            navigate('/admin');
+        }
+    }, [user, loading, navigate]);
     return (
         <div className="flex flex-col">
             <Hero />
@@ -62,21 +72,18 @@ const Home = () => {
                 ]}
                 visualContent={
                     <div className="aspect-[4/3] bg-quest-card rounded-xl relative overflow-hidden border border-quest-text/5 flex flex-col">
-                        {/* Mock Leaderboard UI */}
+                        {/* Mock Level Up UI */}
                         <div className="p-4 border-b border-quest-text/5 flex justify-between items-center bg-quest-text/5">
-                            <span className="font-bold text-sm">Top Innovators</span>
-                            <Users className="w-4 h-4 text-quest-muted" />
+                            <span className="font-bold text-sm">Level Progress</span>
+                            <Zap className="w-4 h-4 text-quest-primary" />
                         </div>
-                        <div className="p-4 space-y-3">
-                            {[1, 2, 3].map((rank) => (
-                                <div key={rank} className="flex items-center gap-3 p-2 bg-quest-text/5 rounded-lg">
-                                    <div className={`w-6 h-6 flex items-center justify-center rounded-full text-xs font-bold ${rank === 1 ? 'bg-yellow-500/20 text-yellow-500' : 'bg-quest-text/10'}`}>
-                                        {rank}
-                                    </div>
-                                    <div className="h-2 w-24 bg-quest-text/10 rounded-full"></div>
-                                    <div className="ml-auto h-2 w-8 bg-quest-primary/20 rounded-full"></div>
-                                </div>
-                            ))}
+                        <div className="p-6 flex flex-col items-center justify-center text-center">
+                            <h3 className="font-bold text-lg mb-1 text-quest-text">Level 5</h3>
+                            <p className="text-xs text-quest-muted mb-4">4,500 / 5,000 XP</p>
+                            <div className="w-full h-2 bg-quest-text/10 rounded-full overflow-hidden">
+                                <div className="w-[90%] h-full bg-gradient-to-r from-quest-primary to-quest-accent"></div>
+                            </div>
+                            <p className="text-xs text-quest-primary mt-4">+500 XP Earned from Patents Module!</p>
                         </div>
                     </div>
                 }
@@ -94,7 +101,7 @@ const Home = () => {
 
                         <h2 className="text-4xl md:text-6xl font-black mb-8 leading-tight">
                             Ready to Claim Your <br />
-                            <span className="text-gradient">Innovator's Badge?</span>
+                            <span className="text-gradient">Title?</span>
                         </h2>
                         <p className="text-quest-muted text-xl mb-12 max-w-2xl mx-auto">
                             Join thousands of creators who are learning to protect their ideas through play.

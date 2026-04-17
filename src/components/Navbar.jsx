@@ -24,13 +24,17 @@ const Navbar = () => {
         ? ((xp) / nextMilestone.xp) * 100
         : 100;
 
-    const navLinks = [
-        { name: 'Home', path: '/' },
-        { name: 'Journey', path: '/roadmap' },
-        { name: 'Modules', path: '/modules' },
-        { name: 'Leaderboard', path: '/leaderboard' },
-        { name: 'About', path: '/about' },
-    ];
+    const navLinks = user?.isAdmin
+        ? [
+            { name: 'Dashboard', path: '/admin' },
+            { name: 'Questions', path: '/admin/questions' },
+        ]
+        : [
+            { name: 'Home', path: '/' },
+            { name: 'Journey', path: '/roadmap' },
+            { name: 'Modules', path: '/modules' },
+            { name: 'Leaderboard', path: '/leaderboard' },
+        ];
 
     return (
         <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? 'bg-quest-card/80 backdrop-blur-lg border-b border-quest-text/10 py-4' : 'bg-transparent py-6'

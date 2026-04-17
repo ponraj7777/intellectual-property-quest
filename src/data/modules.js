@@ -203,46 +203,46 @@ export const modulesData = [
                     ]
                 }
             },
-            // MEDIUM: archery (L4-6)
+            // MEDIUM: memory (L4-6)
             {
-                type: 'archery',
-                title: 'Copyright Archer I',
+                type: 'memory',
+                title: 'Copyright Memory I',
                 description: 'L4: Protected vs Unprotected.',
                 data: {
-                    questions: [
-                        { text: "Is an idea copyrightable?", options: ["Yes", "No", "Only if written down", "Maybe"], correctAnswer: 1 },
-                        { text: "When does copyright protection begin?", options: ["Registration", "Creation", "Publication", "1 year later"], correctAnswer: 1 },
-                        { text: "What symbol represents copyright?", options: ["TM", "R in circle", "C in circle", "SM"], correctAnswer: 2 },
-                        { text: "Can you copyright a recipe list of ingredients?", options: ["Yes", "No", "Only if it tastes good", "Maybe"], correctAnswer: 1 },
-                        { text: "Does a copyright notice (©) need to be visible?", options: ["Yes, always", "No, not anymore", "Only in books", "Only online"], correctAnswer: 1 }
+                    pairs: [
+                        { term: "Idea", definition: "Not copyrightable" },
+                        { term: "Creation", definition: "When protection begins" },
+                        { term: "© Symbol", definition: "Visible copyright notice" },
+                        { term: "Recipe List", definition: "Not protected by copyright" },
+                        { term: "Registration", definition: "Not strictly required for protection" }
                     ]
                 }
             },
             {
-                type: 'archery',
-                title: 'Copyright Archer II',
+                type: 'memory',
+                title: 'Copyright Memory II',
                 description: 'L5: Ownership and transfer.',
                 data: {
-                    questions: [
-                        { text: "Most individual copyrights last for life plus...", options: ["20 years", "50 years", "70 years", "Forever"], correctAnswer: 2 },
-                        { text: "If you sell a painting, do you automatically sell the copyright?", options: ["Yes", "No", "Depends on the price", "Only if recorded"], correctAnswer: 1 },
-                        { text: "Can copyright be inherited?", options: ["No", "Yes", "Only by children", "Only by the state"], correctAnswer: 1 },
-                        { text: "What is 'Joint Authorship'?", options: ["Two people share one name", "Multiple creators sharing copyright", "A legal dispute", "A printing process"], correctAnswer: 1 },
-                        { text: "Registration is required to...", options: ["Own the work", "Sue in court", "Create it", "Sell it"], correctAnswer: 1 }
+                    pairs: [
+                        { term: "Duration", definition: "Life + 70 years" },
+                        { term: "Painting Sale", definition: "Doesn't include copyright transfer" },
+                        { term: "Inheritance", definition: "Copyrights can be passed to heirs" },
+                        { term: "Joint Authorship", definition: "Multiple creators sharing rights" },
+                        { term: "Litigation", definition: "Requires formal registration first" }
                     ]
                 }
             },
             {
-                type: 'archery',
-                title: 'Copyright Archer III',
+                type: 'memory',
+                title: 'Copyright Memory III',
                 description: 'L6: Digital age copyrights.',
                 data: {
-                    questions: [
-                        { text: "Is downloading a movie illegally infringement?", options: ["Yes", "No", "Only if you watch it", "Only if you pay"], correctAnswer: 0 },
-                        { text: "What does Creative Commons provide?", options: ["Free lawyers", "Flexible licensing templates", "Books", "Computer code"], correctAnswer: 1 },
-                        { text: "Are government works usually copyrighted in the US?", options: ["Yes", "No (Public Domain)", "Only secret ones", "Only after 50 years"], correctAnswer: 1 },
-                        { text: "Is software code protected as a literary work?", options: ["No", "Yes", "Only if printed", "Never"], correctAnswer: 1 },
-                        { text: "Using a small snippet of music for a review is:", options: ["Theft", "Fair Use", "Illegal", "Mandatory"], correctAnswer: 1 }
+                    pairs: [
+                        { term: "Piracy", definition: "Illegal unauthorized downloading" },
+                        { term: "Creative Commons", definition: "Flexible licensing templates" },
+                        { term: "Gov Works", definition: "Typically in the Public Domain" },
+                        { term: "Software Code", definition: "Protected as a literary work" },
+                        { term: "Review Snippet", definition: "Typically considered Fair Use" }
                     ]
                 }
             },
@@ -360,7 +360,11 @@ export const modulesData = [
                     ],
                     characters: [
                         { id: 'trademark', name: 'Trademark', icon: '™️' },
-                        { id: 'patent', name: 'Patent', icon: '⚙️' }
+                        { id: 'trade_dress', name: 'Trade Dress', icon: '👗' },
+                        { id: 'genericide', name: 'Genericide', icon: '💀' },
+                        { id: 'patent', name: 'Patent', icon: '⚙️' },
+                        { id: 'copyright', name: 'Copyright', icon: '©️' },
+                        { id: 'renewal', name: 'Renewal', icon: '♻️' }
                     ]
                 }
             },
@@ -380,8 +384,12 @@ export const modulesData = [
                         }
                     ],
                     characters: [
+                        { id: 'trademark', name: 'Trademark', icon: '™️' },
                         { id: 'trade_dress', name: 'Trade Dress', icon: '👗' },
-                        { id: 'copyright', name: 'Copyright', icon: '©️' }
+                        { id: 'genericide', name: 'Genericide', icon: '💀' },
+                        { id: 'patent', name: 'Patent', icon: '⚙️' },
+                        { id: 'copyright', name: 'Copyright', icon: '©️' },
+                        { id: 'renewal', name: 'Renewal', icon: '♻️' }
                     ]
                 }
             },
@@ -401,7 +409,11 @@ export const modulesData = [
                         }
                     ],
                     characters: [
+                        { id: 'trademark', name: 'Trademark', icon: '™️' },
+                        { id: 'trade_dress', name: 'Trade Dress', icon: '👗' },
                         { id: 'genericide', name: 'Genericide', icon: '💀' },
+                        { id: 'patent', name: 'Patent', icon: '⚙️' },
+                        { id: 'copyright', name: 'Copyright', icon: '©️' },
                         { id: 'renewal', name: 'Renewal', icon: '♻️' }
                     ]
                 }

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useLocation } from 'react-router-dom';
 import { modulesData } from '../data/modules';
-import { ArrowLeft, BookOpen, Award, ChevronRight, Calculator, List, RotateCw, HelpCircle, Lock, Trophy, Target } from 'lucide-react';
+import { ArrowLeft, BookOpen, Award, ChevronRight, Calculator, List, RotateCw, HelpCircle, Lock, Trophy, Target, GripHorizontal } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Quiz from '../components/Quiz';
 import SpeedSorter from '../components/SpeedSorter';
@@ -11,7 +11,8 @@ import GuessTheIP from '../components/GuessTheIP';
 import Snakeandladder from '../components/Snakeandladder';
 import ArcheryGame from '../components/ArcheryGame';
 import ReverseHangman from '../components/ReverseHangman';
-import PatentPresentation from '../components/PatentPresentation';
+import MemoryMatch from '../components/MemoryMatch';
+import ModulePresentation from '../components/ModulePresentation';
 import { useGame } from '../hooks/useGame';
 
 const ModuleDetail = () => {
@@ -21,17 +22,84 @@ const ModuleDetail = () => {
     const { user, completedModules, isLevelUnlocked, completedLevels } = useGame();
 
     const [activeGameIndex, setActiveGameIndex] = useState(null);
-    const [difficulty, setDifficulty] = useState('easy');
+    const [dynamicGames, setDynamicGames] = useState([]);
     const [showSlides, setShowSlides] = useState(false);
-
     useEffect(() => {
         if (location.state?.activeLevel !== undefined) {
             setActiveGameIndex(location.state.activeLevel);
         }
-        if (location.state?.difficulty) {
-            setDifficulty(location.state.difficulty);
-        }
     }, [location.state]);
+
+    useEffect(() => {
+        const fetchDynamicQuestions = async () => {
+            try {
+                const response = await fetch(`http://localhost:5000/api/questions/${moduleId}`);
+                if (response.ok) {
+                    const data = await response.json();
+                    setDynamicGames(data);
+                }
+            } catch (error) {
+                console.error('Error fetching dynamic questions:', error);
+            }
+        };
+        if (moduleId) fetchDynamicQuestions();
+    }, [moduleId]);
+
+    // Merge static and dynamic games
+    const allGames = (() => {
+        const games = module ? JSON.parse(JSON.stringify(module.games)) : [];
+        const appends = [];
+
+        dynamicGames.forEach(dg => {
+            if (dg.levelIndex >= 0 && dg.levelIndex < games.length) {
+                const targetGame = games[dg.levelIndex];
+                if (targetGame.type === dg.gameType) {
+                    if (['quiz', 'reverse-hangman', 'archery', 'snake'].includes(dg.gameType)) {
+                        targetGame.data.questions = [
+                            ...(targetGame.data.questions || []),
+                            ...(dg.data.questions || [])
+                        ];
+                    } else if (dg.gameType === 'sorter') {
+                        targetGame.data.items = [
+                            ...(targetGame.data.items || []),
+                            ...(dg.data.items || [])
+                        ];
+                    } else if (dg.gameType === 'match' || dg.gameType === 'memory') {
+                        targetGame.data.pairs = [
+                            ...(targetGame.data.pairs || []),
+                            ...(dg.data.pairs || [])
+                        ];
+                    } else if (dg.gameType === 'spin') {
+                        targetGame.data.segments = [
+                            ...(targetGame.data.segments || []),
+                            ...(dg.data.segments || [])
+                        ];
+                    } else if (dg.gameType === 'guess') {
+                        targetGame.data.scenarios = [
+                            ...(targetGame.data.scenarios || []),
+                            ...(dg.data.scenarios || [])
+                        ];
+                        const existingChars = targetGame.data.characters || [];
+                        const newChars = dg.data.characters || [];
+                        const mergedChars = [...existingChars];
+                        newChars.forEach(nc => {
+                            if (!mergedChars.find(c => c.id === nc.id)) {
+                                mergedChars.push(nc);
+                            }
+                        });
+                        targetGame.data.characters = mergedChars;
+                    }
+                } else {
+                    // Replace for other types if mismatch manually appended
+                    games[dg.levelIndex] = dg;
+                }
+            } else {
+                appends.push(dg);
+            }
+        });
+
+        return [...games, ...appends];
+    })();
 
     const isModuleCompleted = module && completedModules.includes(module.id);
 
@@ -69,7 +137,13 @@ const ModuleDetail = () => {
         );
     }
 
-    const activeGame = activeGameIndex !== null ? module.games[activeGameIndex] : null;
+    const activeGame = activeGameIndex !== null ? allGames[activeGameIndex] : null;
+    const activeDifficulty = activeGameIndex !== null ? (
+        activeGameIndex <= 2 ? 'easy' :
+            activeGameIndex <= 5 ? 'medium' :
+                activeGameIndex <= 8 ? 'hard' :
+                    (allGames[activeGameIndex].difficulty || 'easy')
+    ) : 'easy';
 
     return (
         <div className="container mx-auto px-4 pt-32 pb-12">
@@ -96,7 +170,7 @@ const ModuleDetail = () => {
                         <div className="space-y-4 mb-8">
                             <div className="flex items-center text-sm text-quest-muted">
                                 < BookOpen className="w-4 h-4 mr-3" />
-                                <span>{module.games.length} Challenge Nodes</span>
+                                <span>{allGames.length} Challenge Nodes</span>
                             </div>
                             <div className="flex items-center text-sm text-quest-muted">
                                 <Award className={`w-4 h-4 mr-3 ${isModuleCompleted ? 'text-yellow-500' : ''}`} />
@@ -154,7 +228,7 @@ const ModuleDetail = () => {
                                             transition={{ duration: 0.4, ease: "circOut" }}
                                             className="overflow-hidden"
                                         >
-                                            <PatentPresentation onClose={() => setShowSlides(false)} />
+                                            <ModulePresentation moduleId={moduleId} onClose={() => setShowSlides(false)} />
                                         </motion.div>
                                     )}
                                 </AnimatePresence>
@@ -164,92 +238,81 @@ const ModuleDetail = () => {
                                 <div className="space-y-6">
                                     <div className="flex items-center justify-between">
                                         <h2 className="text-2xl font-bold uppercase tracking-wider">Level Select</h2>
-                                        <div className="flex bg-white/5 p-1 rounded-xl border border-white/10">
-                                            {['easy', 'medium', 'hard'].map((d) => (
-                                                <button
-                                                    key={d}
-                                                    onClick={() => setDifficulty(d)}
-                                                    className={`px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all
-                                                        ${difficulty === d ? 'bg-quest-primary text-white shadow-lg' : 'text-quest-muted hover:text-white'}
-                                                    `}
-                                                >
-                                                    {d}
-                                                </button>
-                                            ))}
-                                        </div>
                                     </div>
                                     <div className="grid grid-cols-1 gap-4">
-                                        {(() => {
-                                            const difficultyIndex = ['easy', 'medium', 'hard'].indexOf(difficulty);
-                                            const startIndex = difficultyIndex * 3;
-                                            const displayGames = module.games.slice(startIndex, startIndex + 3);
-
-                                            return displayGames.map((game, relativeIndex) => {
-                                                const globalIndex = startIndex + relativeIndex;
-                                                const unlocked = isLevelUnlocked(module.id, globalIndex, difficulty);
-                                                return (
-                                                    <button
-                                                        key={globalIndex}
-                                                        disabled={!unlocked}
-                                                        onClick={() => setActiveGameIndex(globalIndex)}
-                                                        className={`glass-panel p-6 rounded-xl text-left transition-all group flex items-center justify-between
+                                        {allGames.map((game, index) => {
+                                            const getDifficulty = (idx, g) => {
+                                                if (idx <= 2) return 'easy';
+                                                if (idx <= 5) return 'medium';
+                                                if (idx <= 8) return 'hard';
+                                                return g.difficulty || 'easy';
+                                            };
+                                            const diff = getDifficulty(index, game);
+                                            const unlocked = isLevelUnlocked(module.id, index, diff);
+                                            return (
+                                                <button
+                                                    key={game._id || index}
+                                                    disabled={!unlocked}
+                                                    onClick={() => setActiveGameIndex(index)}
+                                                    className={`glass-panel p-6 rounded-xl text-left transition-all group flex items-center justify-between
                                                             ${unlocked ? 'hover:border-quest-primary/50' : 'opacity-60 grayscale cursor-not-allowed'}
                                                         `}
-                                                    >
-                                                        <div className="flex items-center gap-4">
-                                                            <div className={`p-4 rounded-xl ${!unlocked ? 'bg-white/5 text-white/20' :
-                                                                game.type === 'quiz' ? 'bg-blue-500/20 text-blue-400' :
-                                                                    game.type === 'sorter' ? 'bg-emerald-500/20 text-emerald-400' :
-                                                                        game.type === 'match' ? 'bg-purple-500/20 text-purple-400' :
-                                                                            game.type === 'spin' ? 'bg-orange-500/20 text-orange-400' :
-                                                                                game.type === 'snake' ? 'bg-amber-500/20 text-amber-400' :
+                                                >
+                                                    <div className="flex items-center gap-4">
+                                                        <div className={`p-4 rounded-xl ${!unlocked ? 'bg-white/5 text-white/20' :
+                                                            game.type === 'quiz' ? 'bg-blue-500/20 text-blue-400' :
+                                                                game.type === 'sorter' ? 'bg-emerald-500/20 text-emerald-400' :
+                                                                    game.type === 'match' ? 'bg-purple-500/20 text-purple-400' :
+                                                                        game.type === 'spin' ? 'bg-orange-500/20 text-orange-400' :
+                                                                            game.type === 'snake' ? 'bg-amber-500/20 text-amber-400' :
+                                                                                game.type === 'memory' ? 'bg-indigo-500/20 text-indigo-400' :
                                                                                     'bg-pink-500/20 text-pink-400'
-                                                                }`}>
-                                                                {!unlocked ? <Lock className="w-6 h-6" /> : (
-                                                                    <>
-                                                                        {game.type === 'quiz' && <List className="w-6 h-6" />}
-                                                                        {game.type === 'sorter' && <Calculator className="w-6 h-6" />}
-                                                                        {game.type === 'match' && <List className="w-6 h-6" />}
-                                                                        {game.type === 'spin' && <RotateCw className="w-6 h-6" />}
-                                                                        {game.type === 'guess' && <HelpCircle className="w-6 h-6" />}
-                                                                        {game.type === 'snake' && <Trophy className="w-6 h-6" />}
-                                                                        {game.type === 'archery' && <Target className="w-6 h-6" />}
-                                                                        {game.type === 'reverse-hangman' && <Target className="w-6 h-6" />}
-                                                                    </>
+                                                            }`}>
+                                                            {!unlocked ? <Lock className="w-6 h-6" /> : (
+                                                                <>
+                                                                    {game.type === 'quiz' && <List className="w-6 h-6" />}
+                                                                    {game.type === 'sorter' && <Calculator className="w-6 h-6" />}
+                                                                    {game.type === 'match' && <List className="w-6 h-6" />}
+                                                                    {game.type === 'spin' && <RotateCw className="w-6 h-6" />}
+                                                                    {game.type === 'guess' && <HelpCircle className="w-6 h-6" />}
+                                                                    {game.type === 'snake' && <Trophy className="w-6 h-6" />}
+                                                                    {game.type === 'archery' && <Target className="w-6 h-6" />}
+                                                                    {game.type === 'reverse-hangman' && <Target className="w-6 h-6" />}
+                                                                    {game.type === 'memory' && <GripHorizontal className="w-6 h-6" />}
+                                                                </>
+                                                            )}
+                                                        </div>
+                                                        <div>
+                                                            <div className="flex items-center gap-2">
+                                                                <span className="text-[10px] font-black uppercase tracking-widest text-quest-muted">Level {index + 1}</span>
+                                                                {completedLevels.includes(`${module.id}-${index}-${diff}`) ? (
+                                                                    <span className="text-[10px] px-1.5 py-0.5 rounded font-bold uppercase bg-green-500/20 text-green-400">
+                                                                        Completed
+                                                                    </span>
+                                                                ) : (
+                                                                    <span className={`text-[10px] px-1.5 py-0.5 rounded font-bold uppercase ${!unlocked ? 'bg-red-500/10 text-red-400' : 'bg-quest-primary/10 text-quest-primary'
+                                                                        }`}>
+                                                                        {diff} {unlocked ? 'Unlocked' : 'Locked'}
+                                                                    </span>
                                                                 )}
                                                             </div>
-                                                            <div>
-                                                                <div className="flex items-center gap-2">
-                                                                    <span className="text-[10px] font-black uppercase tracking-widest text-quest-muted">Level {relativeIndex + 1}</span>
-                                                                    {completedLevels.includes(`${module.id}-${globalIndex}-${difficulty}`) ? (
-                                                                        <span className="text-[10px] px-1.5 py-0.5 rounded font-bold uppercase bg-green-500/20 text-green-400">
-                                                                            Completed
-                                                                        </span>
-                                                                    ) : (
-                                                                        <span className={`text-[10px] px-1.5 py-0.5 rounded font-bold uppercase ${!unlocked ? 'bg-red-500/10 text-red-400' : 'bg-quest-primary/10 text-quest-primary'
-                                                                            }`}>
-                                                                            {difficulty} {unlocked ? 'Unlocked' : 'Locked'}
-                                                                        </span>
-                                                                    )}
-                                                                </div>
-                                                                <h3 className={`text-lg font-bold transition-colors ${unlocked ? 'group-hover:text-quest-primary' : 'text-white/30'}`}>
-                                                                    {game.title}
-                                                                </h3>
-                                                                <p className="text-sm text-quest-muted">
-                                                                    {completedLevels.includes(`${module.id}-${globalIndex}-${difficulty}`)
-                                                                        ? 'Challenge mastered!'
-                                                                        : unlocked
-                                                                            ? game.description
-                                                                            : 'Complete previous level to unlock'
-                                                                    }
-                                                                </p>
-                                                            </div>
+                                                            <h3 className={`text-lg font-bold transition-colors ${unlocked ? 'group-hover:text-quest-primary' : 'text-white/30'}`}>
+                                                                {game.title}
+                                                            </h3>
+                                                            <p className="text-sm text-quest-muted">
+                                                                {completedLevels.includes(`${module.id}-${index}-${diff}`)
+                                                                    ? 'Challenge mastered!'
+                                                                    : unlocked
+                                                                        ? game.description
+                                                                        : 'Complete previous levels to unlock'
+                                                                }
+                                                            </p>
                                                         </div>
-                                                        {unlocked && <ChevronRight className="w-5 h-5 text-quest-muted group-hover:translate-x-1 transition-transform" />}
-                                                    </button>
-                                                );
-                                            });
-                                        })()}
+                                                    </div>
+                                                    {unlocked && <ChevronRight className="w-5 h-5 text-quest-muted group-hover:translate-x-1 transition-transform" />}
+                                                </button>
+                                            );
+                                        })}
                                     </div>
                                 </div>
                             )}
@@ -268,35 +331,38 @@ const ModuleDetail = () => {
                                     <ChevronRight className="w-3 h-3" />
                                     <span className="text-quest-primary">{activeGame.title}</span>
                                     <div className={`ml-2 px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-widest border border-quest-primary/30 text-quest-primary`}>
-                                        {difficulty}
+                                        {activeDifficulty}
                                     </div>
                                 </div>
-                                <div className="text-xs font-bold text-quest-muted uppercase tracking-wider">Node {activeGameIndex + 1} of {module.games.length}</div>
+                                <div className="text-xs font-bold text-quest-muted uppercase tracking-wider">Node {activeGameIndex + 1} of {allGames.length}</div>
                             </div>
 
                             {activeGame.type === 'quiz' && (
-                                <Quiz questions={activeGame.data.questions} moduleId={module.id} levelIndex={activeGameIndex} difficulty={difficulty} />
+                                <Quiz questions={activeGame.data.questions} moduleId={module.id} levelIndex={activeGameIndex} difficulty={activeDifficulty} />
                             )}
                             {activeGame.type === 'sorter' && (
-                                <SpeedSorter gameData={activeGame.data} moduleId={module.id} levelIndex={activeGameIndex} difficulty={difficulty} />
+                                <SpeedSorter gameData={activeGame.data} moduleId={module.id} levelIndex={activeGameIndex} difficulty={activeDifficulty} />
                             )}
                             {activeGame.type === 'match' && (
-                                <TermMatch gameData={activeGame.data} moduleId={module.id} levelIndex={activeGameIndex} difficulty={difficulty} />
+                                <TermMatch gameData={activeGame.data} moduleId={module.id} levelIndex={activeGameIndex} difficulty={activeDifficulty} />
                             )}
                             {activeGame.type === 'spin' && (
-                                <SpinWheel gameData={activeGame.data} moduleId={module.id} levelIndex={activeGameIndex} difficulty={difficulty} />
+                                <SpinWheel gameData={activeGame.data} moduleId={module.id} levelIndex={activeGameIndex} difficulty={activeDifficulty} />
                             )}
                             {activeGame.type === 'guess' && (
-                                <GuessTheIP gameData={activeGame.data} moduleId={module.id} levelIndex={activeGameIndex} difficulty={difficulty} />
+                                <GuessTheIP gameData={activeGame.data} moduleId={module.id} levelIndex={activeGameIndex} difficulty={activeDifficulty} />
                             )}
                             {activeGame.type === 'snake' && (
-                                <Snakeandladder gameData={activeGame.data} moduleId={module.id} levelIndex={activeGameIndex} difficulty={difficulty} />
+                                <Snakeandladder gameData={activeGame.data} moduleId={module.id} levelIndex={activeGameIndex} difficulty={activeDifficulty} />
                             )}
                             {activeGame.type === 'archery' && (
-                                <ArcheryGame gameData={activeGame.data} moduleId={module.id} levelIndex={activeGameIndex} difficulty={difficulty} />
+                                <ArcheryGame gameData={activeGame.data} moduleId={module.id} levelIndex={activeGameIndex} difficulty={activeDifficulty} />
                             )}
                             {activeGame.type === 'reverse-hangman' && (
-                                <ReverseHangman gameData={activeGame.data} moduleId={module.id} levelIndex={activeGameIndex} difficulty={difficulty} />
+                                <ReverseHangman gameData={activeGame.data} moduleId={module.id} levelIndex={activeGameIndex} difficulty={activeDifficulty} />
+                            )}
+                            {activeGame.type === 'memory' && (
+                                <MemoryMatch gameData={activeGame.data} moduleId={module.id} levelIndex={activeGameIndex} difficulty={activeDifficulty} />
                             )}
                         </div>
                     )}

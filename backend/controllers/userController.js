@@ -44,6 +44,7 @@ const registerUser = async (req, res) => {
             dob: user.dob,
             joinedAt: user.createdAt,
             profilePic: user.profilePic,
+            isAdmin: user.isAdmin,
             token: generateToken(user._id),
         });
     } else {
@@ -70,6 +71,7 @@ const authUser = async (req, res) => {
             dob: user.dob,
             joinedAt: user.createdAt,
             profilePic: user.profilePic,
+            isAdmin: user.isAdmin,
             token: generateToken(user._id),
         });
     } else {
@@ -94,6 +96,7 @@ const getUserProfile = async (req, res) => {
             dob: user.dob,
             joinedAt: user.createdAt,
             profilePic: user.profilePic,
+            isAdmin: user.isAdmin,
         });
     } else {
         res.status(404).json({ message: 'User not found' });
@@ -127,7 +130,8 @@ const updateProgress = async (req, res) => {
             message: alreadyCompleted ? 'Already completed' : 'Progress updated',
             completedLevels: user.completedLevels,
             badges: user.badges,
-            newBadges: newBadges
+            newBadges: newBadges,
+            isAdmin: user.isAdmin
         });
     } else {
         res.status(404).json({ message: 'User not found' });
@@ -164,7 +168,8 @@ const addXP = async (req, res) => {
             email: user.email,
             completedLevels: user.completedLevels,
             badges: user.badges,
-            newBadges: newBadges
+            newBadges: newBadges,
+            isAdmin: user.isAdmin
         });
     } else {
         res.status(404).json({ message: 'User not found' });
@@ -181,8 +186,8 @@ const getUserRank = async (req, res) => {
             return res.status(404).json({ message: 'User not found' });
         }
 
-        // Count users with more XP
-        const rank = await User.countDocuments({ xp: { $gt: user.xp } }) + 1;
+        // Count users with more XP who are not admins
+        const rank = await User.countDocuments({ xp: { $gt: user.xp }, isAdmin: { $ne: true } }) + 1;
 
         res.json({
             rank,
@@ -200,7 +205,7 @@ const getUserRank = async (req, res) => {
 // @access  Public
 const getLeaderboard = async (req, res) => {
     try {
-        const topUsers = await User.find({})
+        const topUsers = await User.find({ isAdmin: { $ne: true } })
             .sort({ xp: -1, level: -1 })
             .limit(10)
             .select('name xp level profilePic badges');
@@ -234,11 +239,92 @@ const updateUserProfile = async (req, res) => {
             completedLevels: updatedUser.completedLevels,
             dob: updatedUser.dob,
             joinedAt: updatedUser.createdAt,
-            profilePic: updatedUser.profilePic
+            profilePic: updatedUser.profilePic,
+            isAdmin: updatedUser.isAdmin
         });
     } else {
         res.status(404).json({ message: 'User not found' });
     }
 };
 
-export { registerUser, authUser, getUserProfile, updateProgress, addXP, getLeaderboard, getUserRank, updateUserProfile };
+// @desc    Get all users
+// @route   GET /api/users
+// @access  Private/Admin
+const getUsers = async (req, res) => {
+    try {
+        const users = await User.find({}).select('-password');
+        res.json(users);
+    } catch (error) {
+        res.status(500).json({ message: 'Error fetching users' });
+    }
+};
+
+// @desc    Get user by ID
+// @route   GET /api/users/:id
+// @access  Private/Admin
+const getUserById = async (req, res) => {
+    try {
+        const user = await User.findById(req.params.id).select('-password');
+        if (user) {
+            res.json(user);
+        } else {
+            res.status(404).json({ message: 'User not found' });
+        }
+    } catch (error) {
+        res.status(500).json({ message: 'Error fetching user' });
+    }
+};
+
+// @desc    Update user
+// @route   PUT /api/users/:id
+// @access  Private/Admin
+const updateUser = async (req, res) => {
+    try {
+        const user = await User.findById(req.params.id);
+
+        if (user) {
+            user.name = req.body.name || user.name;
+            user.email = req.body.email || user.email;
+            user.xp = req.body.xp !== undefined ? req.body.xp : user.xp;
+            user.level = req.body.level !== undefined ? req.body.level : user.level;
+            
+            if (req.body.isAdmin !== undefined) {
+                user.isAdmin = req.body.isAdmin;
+            }
+
+            const updatedUser = await user.save();
+
+            res.json({
+                _id: updatedUser._id,
+                name: updatedUser.name,
+                email: updatedUser.email,
+                isAdmin: updatedUser.isAdmin,
+                xp: updatedUser.xp,
+                level: updatedUser.level
+            });
+        } else {
+            res.status(404).json({ message: 'User not found' });
+        }
+    } catch (error) {
+        res.status(500).json({ message: 'Error updating user' });
+    }
+};
+
+// @desc    Delete user
+// @route   DELETE /api/users/:id
+// @access  Private/Admin
+const deleteUser = async (req, res) => {
+    try {
+        const user = await User.findById(req.params.id);
+        if (user) {
+            await user.deleteOne();
+            res.json({ message: 'User removed' });
+        } else {
+            res.status(404).json({ message: 'User not found' });
+        }
+    } catch (error) {
+        res.status(500).json({ message: 'Error deleting user' });
+    }
+};
+
+export { registerUser, authUser, getUserProfile, updateProgress, addXP, getLeaderboard, getUserRank, updateUserProfile, getUsers, getUserById, updateUser, deleteUser };

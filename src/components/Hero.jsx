@@ -22,9 +22,7 @@ const Hero = () => {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.6 }}
                     >
-                        <span className="inline-block py-1 px-3 rounded-full bg-quest-card border border-quest-primary/30 text-quest-primary text-sm font-medium mb-6 backdrop-blur-sm">
-                            Gamified Intellectual Property Education
-                        </span>
+                       
                         <h1 className="text-5xl md:text-7xl font-heading font-bold mb-6 leading-tight">
                             Master the World of <br />
                             <motion.span

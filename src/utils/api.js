@@ -84,6 +84,60 @@ const api = {
         if (!response.ok) throw new Error(data.message || 'Failed to update profile');
         return data;
     },
+    async getUsers(token) {
+        const response = await fetch(`${API_URL}/users`, {
+            headers: { Authorization: `Bearer ${token}` },
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.message || 'Failed to fetch users');
+        return data;
+    },
+
+    async getQuestions(moduleId = null) {
+        const url = moduleId ? `${API_URL}/questions/${moduleId}` : `${API_URL}/questions`;
+        const response = await fetch(url);
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.message || 'Failed to fetch questions');
+        return data;
+    },
+
+    async createQuestion(token, questionData) {
+        const response = await fetch(`${API_URL}/questions`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify(questionData),
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.message || 'Failed to create question');
+        return data;
+    },
+
+    async updateQuestion(token, id, questionData) {
+        const response = await fetch(`${API_URL}/questions/${id}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify(questionData),
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.message || 'Failed to update question');
+        return data;
+    },
+
+    async deleteQuestion(token, id) {
+        const response = await fetch(`${API_URL}/questions/${id}`, {
+            method: 'DELETE',
+            headers: { Authorization: `Bearer ${token}` },
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.message || 'Failed to delete question');
+        return data;
+    },
 };
 
 export default api;
