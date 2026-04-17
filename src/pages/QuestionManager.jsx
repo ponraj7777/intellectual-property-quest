@@ -58,8 +58,29 @@ const QuestionManager = () => {
     const fetchQuestions = async () => {
         try {
             const response = await fetch('http://localhost:5000/api/questions');
-            const data = await response.json();
-            setQuestions(data);
+            const dbQuestions = await response.json();
+            
+            const staticQuestions = [];
+            modulesData.forEach(module => {
+                module.games.forEach((game, levelIndex) => {
+                    const hasOverride = dbQuestions.some(q => q.moduleId === module.id && q.levelIndex === levelIndex);
+                    if (!hasOverride) {
+                        staticQuestions.push({
+                            _id: `static-${module.id}-${levelIndex}`,
+                            isStatic: true,
+                            moduleId: module.id,
+                            gameType: game.type,
+                            difficulty: levelIndex <= 2 ? 'easy' : levelIndex <= 5 ? 'medium' : 'hard',
+                            levelIndex: levelIndex,
+                            title: game.title,
+                            description: game.description,
+                            data: game.data
+                        });
+                    }
+                });
+            });
+
+            setQuestions([...staticQuestions, ...dbQuestions]);
         } catch (error) {
             toast.error('Failed to fetch questions');
         } finally {
@@ -105,6 +126,11 @@ const QuestionManager = () => {
     };
 
     const handleDelete = async (id) => {
+        if (typeof id === 'string' && id.startsWith('static-')) {
+            toast.error("Factory defaults cannot be deleted entirely. Click 'Edit' instead to remove its internal questions.");
+            return;
+        }
+
         if (!window.confirm('Are you sure you want to delete this question?')) return;
 
         try {
@@ -129,11 +155,13 @@ const QuestionManager = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const url = editingId
+            const isEditingStatic = typeof editingId === 'string' && editingId.startsWith('static-');
+            
+            const url = (editingId && !isEditingStatic)
                 ? `http://localhost:5000/api/questions/${editingId}`
                 : 'http://localhost:5000/api/questions';
 
-            const method = editingId ? 'PUT' : 'POST';
+            const method = (editingId && !isEditingStatic) ? 'PUT' : 'POST';
 
             const response = await fetch(url, {
                 method,
@@ -784,7 +812,8 @@ const QuestionManager = () => {
                                 </button>
                                 <button
                                     onClick={() => handleDelete(q._id)}
-                                    className="p-2 dark:bg-white/5 bg-black/5 hover:bg-red-500/20 text-quest-muted hover:text-red-500 rounded-lg transition-all"
+                                    className={`p-2 dark:bg-white/5 bg-black/5 rounded-lg transition-all ${q.isStatic ? 'opacity-50 cursor-not-allowed hover:bg-black/5 text-quest-muted' : 'hover:bg-red-500/20 text-quest-muted hover:text-red-500'}`}
+                                    title={q.isStatic ? "Default levels cannot be deleted. Click Edit to override." : "Delete"}
                                 >
                                     <Trash2 size={16} />
                                 </button>

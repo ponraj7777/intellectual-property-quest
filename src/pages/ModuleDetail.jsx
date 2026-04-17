@@ -53,46 +53,12 @@ const ModuleDetail = () => {
         dynamicGames.forEach(dg => {
             if (dg.levelIndex >= 0 && dg.levelIndex < games.length) {
                 const targetGame = games[dg.levelIndex];
-                if (targetGame.type === dg.gameType) {
-                    if (['quiz', 'reverse-hangman', 'archery', 'snake'].includes(dg.gameType)) {
-                        targetGame.data.questions = [
-                            ...(targetGame.data.questions || []),
-                            ...(dg.data.questions || [])
-                        ];
-                    } else if (dg.gameType === 'sorter') {
-                        targetGame.data.items = [
-                            ...(targetGame.data.items || []),
-                            ...(dg.data.items || [])
-                        ];
-                    } else if (dg.gameType === 'match' || dg.gameType === 'memory') {
-                        targetGame.data.pairs = [
-                            ...(targetGame.data.pairs || []),
-                            ...(dg.data.pairs || [])
-                        ];
-                    } else if (dg.gameType === 'spin') {
-                        targetGame.data.segments = [
-                            ...(targetGame.data.segments || []),
-                            ...(dg.data.segments || [])
-                        ];
-                    } else if (dg.gameType === 'guess') {
-                        targetGame.data.scenarios = [
-                            ...(targetGame.data.scenarios || []),
-                            ...(dg.data.scenarios || [])
-                        ];
-                        const existingChars = targetGame.data.characters || [];
-                        const newChars = dg.data.characters || [];
-                        const mergedChars = [...existingChars];
-                        newChars.forEach(nc => {
-                            if (!mergedChars.find(c => c.id === nc.id)) {
-                                mergedChars.push(nc);
-                            }
-                        });
-                        targetGame.data.characters = mergedChars;
-                    }
-                } else {
-                    // Replace for other types if mismatch manually appended
-                    games[dg.levelIndex] = dg;
-                }
+                
+                // STRICT OVERRIDE: Database entry completely overwrites default JSON
+                targetGame.data = dg.data;
+                if (dg.title) targetGame.title = dg.title;
+                if (dg.description) targetGame.description = dg.description;
+                if (dg.gameType) targetGame.type = dg.gameType;
             } else {
                 appends.push(dg);
             }
